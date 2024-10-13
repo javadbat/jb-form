@@ -1,0 +1,44 @@
+{
+  "name": "jb-form",
+  "description": "form web component with extended feature",
+  "type": "module",
+  "author": {
+    "name": "mohammad javad bathaei",
+    "email": "javadbat@gmail.com"
+  },
+  "keywords": [
+    "jb",
+    "jb-form",
+    "form",
+    "validation",
+    "form web-component",
+    "web-component"
+  ],
+  "version": "0.0.1",
+  "bugs": "https://github.com/javadbat/jb-form/issues",
+  "license": "MIT",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "lib/",
+    "lib/types.ts",
+    "dist/"
+  ],
+  "main": "index.js",
+  "module": "index.js",
+  "homepage": "https://github.com/javadbat/jb-form",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/javadbat/jb-form"
+  },
+  "types": "./dist/web-component/jb-form/lib/jb-form.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/web-component/jb-form/lib/jb-form.d.ts"],
+      "types":["./dist/web-component/jb-form/lib/types.d.ts"]
+    }
+  },
+  "dependencies": {
+
+  }
+}
