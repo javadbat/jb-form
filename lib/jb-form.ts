@@ -1,4 +1,4 @@
-import { ElementsObject } from './types';
+import { ExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult } from './types';
 import { WithValidation } from 'jb-validation/types';
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
@@ -7,13 +7,11 @@ export class JBFormWebComponent extends HTMLFormElement {
   constructor() {
     super();
     this.initWebComponent();
-    console.log('element', this.elements);
   }
   initWebComponent() {
     this.#registerEventListener();
     this.checkValidity = this.#checkValidity;
     this.reportValidity = this.#reportValidity;
-    console.log(this.on);
   }
   static get observedAttributes(): string[] {
     return [];
@@ -26,15 +24,22 @@ export class JBFormWebComponent extends HTMLFormElement {
     this.addEventListener("submit", (e: SubmitEvent) => this.#onSubmit(e), { passive: false });
   }
   #onSubmit(e: SubmitEvent) {
+    //prevent catching our dispatch event
+    if (!e.isTrusted) {
+      return;
+    }
     e.stopPropagation();
     e.preventDefault();
-    this.checkValidity();
+    const isAllValid = this.reportValidity();
+    if (isAllValid) {
+      this.#dispatchSubmitEvent(e);
+    }
   }
   #checkValidity(): boolean {
     //
     //TODO:it's not feasible now but try to bind for natural checkValidity when browser support it.
     for (const elem of this.elements) {
-      const element = elem as unknown as WithValidation
+      const element = elem as unknown as WithValidation;
       if (typeof element.checkValidity == "function") {
         //it will automatically update validation result on check
         element.checkValidity();
@@ -47,7 +52,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     //
     //TODO:try to bind for natural checkValidity and do not use this methods
     for (const elem of this.elements) {
-      const element = elem as unknown as WithValidation
+      const element = elem as unknown as WithValidation;
       if (typeof element.reportValidity == "function") {
         element.reportValidity();
       }
@@ -59,6 +64,83 @@ export class JBFormWebComponent extends HTMLFormElement {
     const event = new SubmitEvent('submit', { ...e });
     this.dispatchEvent(event);
   }
+  /**
+   * @description returns key value object contains validation message of named element
+   * @returns @public
+   */
+  getValidationMessages(): FormValidationMessages {
+    return this.#traverseNamedElements((formElement) => formElement.validationMessage ?? null);
+  }
+  /**
+   * @description returns key value object contains validation summary result of named element
+   * @returns @public
+   */
+  getValidationSummary(): FormValidationSummary {
+    return this.#traverseNamedElements((formElement) => formElement.validation?.resultSummary ?? null);
+  }
+  /**
+   * @description returns key value object contains validation summary result of named element
+   * @returns @public
+   */
+  getValidationResult(): FormValidationResult {
+    return this.#traverseNamedElements((formElement) => formElement.validation?.result ?? null);
+  }
+  /**
+ * @description returns key value object contains value of named element
+ * @returns @public
+ */
+  getFormValues(): FormValues {
+    return this.#traverseNamedElements((formElement) => formElement.value);
+  }
+  /**
+* @description returns key value object contains dirty status of named element
+* @returns @public
+*/
+  getFormDirtyStatus(): TraverseResult<boolean> {
+    return this.#traverseNamedElements((formElement) => formElement.isDirty);
+  }
+  /**
+* @description set value of named form input elements
+* @param shouldUpdateInitialValue determine if we should also update initial value or not. pass false if you want initialValue remain untouched
+* @returns @public
+*/
+  setFormValues(value: FormValues,shouldUpdateInitialValue = true) {
+    for (const elem of this.elements) {
+      const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
+      if (formElement.name && value[formElement.name] !== undefined) {
+        formElement.value = value[formElement.name];
+      }
+    }
+    if(shouldUpdateInitialValue){
+      this.setFormInitialValues(value);
+    }
+  }
+  /**
+* @description set initial value of named form input elements used for dirty field detection
+* @returns @public
+*/
+  setFormInitialValues(value: FormValues) {
+    for (const elem of this.elements) {
+      const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
+      if (formElement.name && value[formElement.name] !== undefined) {
+        formElement.initialValue = value[formElement.name];
+      }
+    }
+  }
+
+  #traverseNamedElements<T>(extractFunction: ExtractFunction<T>): TraverseResult<T> {
+    type ValueType = ReturnType<typeof extractFunction>;
+    const result: TraverseResult<ValueType> = {};
+    for (const elem of this.elements) {
+      //make it partial so every callback function have to check for nullable properties
+      const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
+      if (formElement.name) {
+        result[formElement.name] = extractFunction(formElement);
+      }
+    }
+    return result;
+  }
+
   #onAttributeChange(name: string, value: string) {
     // switch (name) {
     //   case 'isLoading':
