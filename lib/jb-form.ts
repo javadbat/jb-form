@@ -112,19 +112,22 @@ export class JBFormWebComponent extends HTMLFormElement {
       }
     }
     if(shouldUpdateInitialValue){
-      this.setFormInitialValues(value);
+      this.setFormInitialValues(value,false);
     }
   }
   /**
 * @description set initial value of named form input elements used for dirty field detection
 * @returns @public
 */
-  setFormInitialValues(value: FormValues) {
+  setFormInitialValues(value: FormValues,shouldUpdateValue = true) {
     for (const elem of this.elements) {
       const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
       if (formElement.name && value[formElement.name] !== undefined) {
         formElement.initialValue = value[formElement.name];
       }
+    }
+    if(shouldUpdateValue){
+      this.setFormValues(value,false);
     }
   }
 

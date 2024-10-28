@@ -71,7 +71,30 @@ all jb design system support [jb-validation](https://github.com/javadbat/jb-vali
 just check that your element must have `name` attribute in its HTML `<jb-input name="something"/>`.
 if you have a form element that dont support [jb-validation](https://github.com/javadbat/jb-validation) you can easily create a custom element that implements `WithValidation<ValidationValue>` interface. for more detail read [jb-validation](https://github.com/javadbat/jb-validation) doc.
 
+## value control
 
+jb-design system components support some methods to manage values and state of themselves. things such as `isDirty` , `initialValue` are some of them.    
+jb-form provide you some methods that let you manage them easier. here are the methods:
+```js
+//return all named element values in a single object
+form.getFormValues()
+// return a object of named elements with their dirty status(read doc below the code for more information)
+form.getFormDirtyStatus();
+const formValue = {
+  name:"joe",
+  age:10
+}
+// set value of form elements.(elements match by their name)
+form.setFormValues(formValue);
+//if second argument is true or not provided setFormValues will also update initial value and if set to false it just update value
+form.setFormValues(formValue,false);
+// set initial value of form elements.(initial value is used to compare with value and set isDirty flag)
+form.setFormInitialValues(formValue)
+//if second argument is true or not provided setFormInitialValues will also update value and if set to false it just update value
+form.setFormInitialValues(formValue,false)
+```
+as you can see all elements have 2 values fields `value` & `initialValue`. value is a normal value of the fields but initial value is used just to be compared with value and set `isDirty` field.
+`isDirty` will be true if user change the input value from a provided initial value.
 
 
 
