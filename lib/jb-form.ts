@@ -134,9 +134,8 @@ export class JBFormWebComponent extends HTMLFormElement {
   #traverseNamedElements<T>(extractFunction: ExtractFunction<T>): TraverseResult<T> {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
-    for (const elem of this.elements) {
-      //make it partial so every callback function have to check for nullable properties
-      const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
+    //make it partial so every callback function have to check for nullable properties
+    for (const formElement of this.elements as unknown as Partial<WithValidation & JBFormInputStandards>[]) {
       if (formElement.name) {
         result[formElement.name] = extractFunction(formElement);
       }
