@@ -1,1 +1,1 @@
-export * from './lib/types';
+export * from './dist/web-component/jb-form/lib/types.d';
