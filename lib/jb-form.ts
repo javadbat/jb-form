@@ -1,5 +1,5 @@
 import { ExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult } from './types';
-import { WithValidation } from 'jb-validation/types';
+import { type WithValidation } from 'jb-validation';
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;

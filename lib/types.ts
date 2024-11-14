@@ -1,4 +1,4 @@
-import { ValidationResult, ValidationResultSummary, WithValidation } from "jb-validation/types"
+import type { ValidationResult, ValidationResultSummary, WithValidation } from "jb-validation"
 
 //indicate which property is essential for element to be jb-form compatible 
 export interface JBFormInputStandards<TValue=string> {
