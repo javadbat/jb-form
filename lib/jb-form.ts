@@ -1,5 +1,6 @@
 import { ExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult } from './types';
 import { type WithValidation } from 'jb-validation';
+export * from './types';
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
@@ -49,16 +50,16 @@ export class JBFormWebComponent extends HTMLFormElement {
     return validationResult;
   }
   #reportValidity(): boolean {
-    //
+    let isAllValid = true;
     //TODO:try to bind for natural checkValidity and do not use this methods
     for (const elem of this.elements) {
       const element = elem as unknown as WithValidation;
       if (typeof element.reportValidity == "function") {
-        element.reportValidity();
+        isAllValid = element.reportValidity() && isAllValid;
       }
     }
-    const validationResult = this.#formReportValidity();
-    return validationResult;
+    // isAllValid = isAllValid && this.#formReportValidity();
+    return isAllValid;
   }
   #dispatchSubmitEvent(e: SubmitEvent) {
     const event = new SubmitEvent('submit', { ...e });
