@@ -95,6 +95,40 @@ form.setFormInitialValues(formValue,false)
 ```
 as you can see all elements have 2 values fields `value` & `initialValue`. value is a normal value of the fields but initial value is used just to be compared with value and set `isDirty` field.
 `isDirty` will be true if user change the input value from a provided initial value.
+remember `setFormValues` and `setFormInitialValues` second argument is `shouldUpdateInitialValue` that is `true` by default so when you call one it call the others so the get sync but if you want to just set one of them and not the other, just pass false in it
 
+## virtual elements
+
+you may have some custom inputs or form elements that's not quite implement jb-validation and jb-form standards but you need to put them in the form and validate them or control them like others.    
+for doing so you just need to call `addVirtualElement` function:
+
+```typescript
+// here is type of VirtualElement you need to build
+//TValue is the component normal value you always want to get and TValidationValue is the value you want to pass to validation module validators. they may be the same type or not base on your component 
+type VirtualElement<TValue,TValidationValue> = {
+  //name of the field in all result returns. it's required.
+  name:string,
+  //jb-validation standard ValidationHelper object. if not provided all validation methods will skip this input
+  validation?:ValidationHelper<TValidationValue>,
+  //the function that may return value of the component
+  getValue?:()=>TValue,
+  // a function that determine if component value changed in compare to provided initialValue
+  getDirtyStatus?:()=>boolean,
+  //called whenever form `setFormValues` called and set the component value
+  setValue?:(value:TValue)=>void
+  //called whenever form `setFormInitialValues` called and set the component initial value
+  setInitialValue?:(value:TValue)=>void
+}
+
+const tagList:VirtualElement<string[],string[]> = {
+  name:'tagList',
+  validation:new ValidationHelper(...),
+  getValue: ()=>{return list},
+  //it's just an example write a real full compare function here.
+  getDirtyStatus()=>{return list.length !== initialList.length },
+  setValue(newValue)=>{ list= newValue },
+  setInitialValue(newValue)=>{ initialList= newValue },
+}
+```
 
 

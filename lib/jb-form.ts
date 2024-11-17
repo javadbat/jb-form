@@ -1,10 +1,12 @@
-import { ExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult } from './types';
+import { ExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, VirtualElement, VirtualExtractFunction } from './types';
 import { type WithValidation } from 'jb-validation';
 export * from './types';
+//TODO: add events for onDirtyChange or onValidationChange 
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
   #formReportValidity = this.reportValidity;
+  #virtualElements: VirtualElement<any, any>[] = []
   constructor() {
     super();
     this.initWebComponent();
@@ -47,7 +49,14 @@ export class JBFormWebComponent extends HTMLFormElement {
       }
     }
     const validationResult = this.#formCheckValidity();
-    return validationResult;
+    const virtualResult = this.#virtualElements.reduce((acc, item) => {
+      if(typeof item.validation?.checkValidity !== "function"){
+        return acc;
+      }
+      return item.validation.checkValidity(false) && acc;
+    }, true);
+
+    return validationResult && virtualResult;
   }
   #reportValidity(): boolean {
     let isAllValid = true;
@@ -58,8 +67,14 @@ export class JBFormWebComponent extends HTMLFormElement {
         isAllValid = element.reportValidity() && isAllValid;
       }
     }
+    const virtualResult = this.#virtualElements.reduce((acc, item) => {
+      if(typeof item.validation?.checkValidity !== "function"){
+        return acc;
+      }
+      return item.validation.checkValidity(true) && acc;
+    }, true);
     // isAllValid = isAllValid && this.#formReportValidity();
-    return isAllValid;
+    return isAllValid && virtualResult;
   }
   #dispatchSubmitEvent(e: SubmitEvent) {
     const event = new SubmitEvent('submit', { ...e });
@@ -70,69 +85,89 @@ export class JBFormWebComponent extends HTMLFormElement {
    * @returns @public
    */
   getValidationMessages(): FormValidationMessages {
-    return this.#traverseNamedElements((formElement) => formElement.validationMessage ?? null);
+    return this.#traverseNamedElements(
+      (formElement) => formElement.validationMessage ?? null,
+      (vElement) => vElement.validation?.resultSummary?.message ?? null,
+    );
   }
   /**
    * @description returns key value object contains validation summary result of named element
    * @returns @public
    */
   getValidationSummary(): FormValidationSummary {
-    return this.#traverseNamedElements((formElement) => formElement.validation?.resultSummary ?? null);
+    return this.#traverseNamedElements((formElement) => formElement.validation?.resultSummary ?? null,
+      (vElement) => vElement.validation?.resultSummary ?? null,
+    );
   }
   /**
    * @description returns key value object contains validation summary result of named element
    * @returns @public
    */
   getValidationResult(): FormValidationResult {
-    return this.#traverseNamedElements((formElement) => formElement.validation?.result ?? null);
+    return this.#traverseNamedElements((formElement) => formElement.validation?.result ?? null,
+      (vElement) => vElement.validation?.result ?? null
+    );
   }
   /**
  * @description returns key value object contains value of named element
  * @returns @public
  */
   getFormValues(): FormValues {
-    return this.#traverseNamedElements((formElement) => formElement.value);
+    return this.#traverseNamedElements((formElement) => formElement.value,
+      (vElement) => typeof vElement.getValue == "function"?vElement.getValue():null,
+    );
   }
   /**
 * @description returns key value object contains dirty status of named element
 * @returns @public
 */
   getFormDirtyStatus(): TraverseResult<boolean> {
-    return this.#traverseNamedElements((formElement) => formElement.isDirty);
+    return this.#traverseNamedElements((formElement) => formElement.isDirty,
+      (vElement) => typeof vElement.getDirtyStatus == "function"?vElement.getDirtyStatus():null,
+    );
   }
   /**
 * @description set value of named form input elements
 * @param shouldUpdateInitialValue determine if we should also update initial value or not. pass false if you want initialValue remain untouched
 * @returns @public
 */
-  setFormValues(value: FormValues,shouldUpdateInitialValue = true) {
+  setFormValues(value: FormValues, shouldUpdateInitialValue = true) {
     for (const elem of this.elements) {
       const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
       if (formElement.name && value[formElement.name] !== undefined) {
         formElement.value = value[formElement.name];
       }
     }
-    if(shouldUpdateInitialValue){
-      this.setFormInitialValues(value,false);
+    for (const vElem of this.#virtualElements) {
+      if (vElem.name && value[vElem.name] !== undefined && typeof vElem.setValue == "function") {
+        vElem.setValue(value[vElem.name]) ;
+      }
+    }
+    if (shouldUpdateInitialValue) {
+      this.setFormInitialValues(value, false);
     }
   }
   /**
 * @description set initial value of named form input elements used for dirty field detection
 * @returns @public
 */
-  setFormInitialValues(value: FormValues,shouldUpdateValue = true) {
+  setFormInitialValues(value: FormValues, shouldUpdateValue = true) {
     for (const elem of this.elements) {
       const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
       if (formElement.name && value[formElement.name] !== undefined) {
         formElement.initialValue = value[formElement.name];
       }
     }
-    if(shouldUpdateValue){
-      this.setFormValues(value,false);
+    for (const vElem of this.#virtualElements) {
+      if (vElem.name && value[vElem.name] !== undefined && typeof vElem.setInitialValue == "function") {
+        vElem.setInitialValue(value[vElem.name]) ;
+      }
+    }
+    if (shouldUpdateValue) {
+      this.setFormValues(value, false);
     }
   }
-
-  #traverseNamedElements<T>(extractFunction: ExtractFunction<T>): TraverseResult<T> {
+  #traverseFormNamedElements<T>(extractFunction: ExtractFunction<T>): TraverseResult<T> {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
     //make it partial so every callback function have to check for nullable properties
@@ -143,7 +178,33 @@ export class JBFormWebComponent extends HTMLFormElement {
     }
     return result;
   }
-
+  #traverseNamedElements<T>(extractFunction: ExtractFunction<T>, virtualExtractFunction: VirtualExtractFunction<T>): TraverseResult<T> {
+    const formElementResult = this.#traverseFormNamedElements(extractFunction);
+    const virtualResult = this.#traverseVirtualElement(virtualExtractFunction);
+    return { ...formElementResult, ...virtualResult };
+  }
+  /**
+   * @public add virtual element let you register some non standard form element into this form to activate all form helpers and methods for them
+   * @param element the element you want to register
+   */
+  addVirtualElement<TValue, TValidationValue>(element: VirtualElement<TValue, TValidationValue>) {
+    this.#virtualElements.push(element);
+  }
+  /**
+   * will traverse all virtual inputs and return object of requested data
+   * @param extractFunction 
+   */
+  #traverseVirtualElement<T>(extractFunction: VirtualExtractFunction<T>) {
+    type ValueType = ReturnType<typeof extractFunction>;
+    const result: TraverseResult<ValueType> = {};
+    //make it partial so every callback function have to check for nullable properties
+    for (const formElement of this.#virtualElements) {
+      if (formElement.name) {
+        result[formElement.name] = extractFunction(formElement);
+      }
+    }
+    return result;
+  }
   #onAttributeChange(name: string, value: string) {
     // switch (name) {
     //   case 'isLoading':

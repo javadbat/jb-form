@@ -1,4 +1,4 @@
-import type { ValidationResult, ValidationResultSummary, WithValidation } from "jb-validation"
+import type { ValidationResult, ValidationResultSummary, WithValidation, ValidationHelper } from "jb-validation";
 
 //indicate which property is essential for element to be jb-form compatible 
 export interface JBFormInputStandards<TValue=string> {
@@ -30,3 +30,12 @@ export type FormValues<TValue=any> = {
   [key:string]: TValue
 }
 export type ExtractFunction<T> = (formElement: Partial<WithValidation & JBFormInputStandards>)=>T;
+export type VirtualExtractFunction<T> = (formElement: VirtualElement<any,any>)=>T;
+export type VirtualElement<TValue,TValidationValue> = {
+  name:string,
+  validation?:ValidationHelper<TValidationValue>,
+  getValue?:()=>TValue,
+  getDirtyStatus?:()=>boolean,
+  setValue?:(value:TValue)=>void
+  setInitialValue?:(value:TValue)=>void
+}

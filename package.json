@@ -14,7 +14,7 @@
     "form web-component",
     "web-component"
   ],
-  "version": "0.0.12",
+  "version": "0.1.0",
   "bugs": "https://github.com/javadbat/jb-form/issues",
   "license": "MIT",
   "files": [
