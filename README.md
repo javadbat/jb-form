@@ -1,5 +1,17 @@
 # jb-form
-jb design system special form with special feature
+
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/jb-form)
+[![GitHub license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/javadbat/jb-form/master/LICENSE)
+[![NPM Downloads](https://img.shields.io/npm/dw/jb-form)](https://www.npmjs.com/package/jb-form)
+
+jb design system special form with special feature like dirty check and validation
+
+benefits:
+
+- you can check validation of all form inputs and elements with just one command.
+- you can check dirty status of all form inputs and elements with just one command.
+- you can set value of all form inputs and elements with just one command.
+- standard events for dirty change or validation change to notify you in real time.
 
 ## setup & install
 
@@ -131,4 +143,33 @@ const tagList:VirtualElement<string[],string[]> = {
 }
 ```
 
+## Events
 
+jb-form add some new events to let you monitor your form in real time when something changes:
+```javascript
+  //called when submit button clicked or form.requestSubmit called
+  form.addEventListener('submit',onSubmit);
+  // when form dirty status change (updated on input change event)
+  form.addEventListener('dirty-change',onDirtyChange);
+  // when form validity change (updated on input change event)
+  form.addEventListener('validity-change',onValidityChange);
+  // here is the example for callback function 
+  const onSubmit = ()=>{
+    alert("submit");
+  };
+  const onDirtyChange = (e)=>{
+    //you can set react states or log its new status
+    setIsDirty(e.detail.isDirty);
+  };
+  const onValidityChange = (e)=>{
+    //you can set react states or log its new status
+    setIsValid(e.detail.isValid);
+  };
+```
+
+
+## Other Related Docs:
+
+- see [All JB Design system Component List](https://github.com/javadbat/design-system/blob/master/docs/component-list.md) for more components.
+
+- use [Contribution Guide](https://github.com/javadbat/design-system/blob/master/docs/contribution-guide.md) if you want to contribute in this component.

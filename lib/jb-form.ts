@@ -16,12 +16,19 @@ export class JBFormWebComponent extends HTMLFormElement {
     this.checkValidity = this.#checkValidity;
     this.reportValidity = this.#reportValidity;
   }
+  connectedCallback(){
+    this.#handleStateChanges();
+  }
   static get observedAttributes(): string[] {
     return [];
   }
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     // do something when an attribute has changed
     this.#onAttributeChange(name, newValue);
+  }
+  get isDirty():boolean{
+    const res = this.getFormDirtyStatus();
+    return Object.values(res).reduce((acc,val)=>acc || val,false);
   }
   #registerEventListener(): void {
     this.addEventListener("submit", (e: SubmitEvent) => this.#onSubmit(e), { passive: false });
@@ -204,6 +211,37 @@ export class JBFormWebComponent extends HTMLFormElement {
       }
     }
     return result;
+  }
+  //keep dirty status from the last time check.
+  #prevIsDirty = false;
+  #prevValidity = this.checkValidity();
+  #handleStateChanges(){
+    const checkForDirty = ()=>{
+      const currentIsDirty = this.isDirty;
+      if(currentIsDirty !== this.#prevIsDirty){
+        const event = new CustomEvent("dirty-change",{detail:{isDirty:currentIsDirty}});
+        this.dispatchEvent(event);
+        this.#prevIsDirty = currentIsDirty;
+      }
+    };
+    const checkForValidity = ()=>{
+      const currentValidity = this.checkValidity();
+      if(currentValidity !== this.#prevValidity){
+        const event = new CustomEvent("validity-change",{detail:{isValid:currentValidity}});
+        this.dispatchEvent(event);
+        this.#prevValidity = currentValidity;
+      }
+    };
+    this.addEventListener("change",(e)=>{
+      const changedElement = e.target as unknown as Partial<JBFormInputStandards & WithValidation> ;
+      if(changedElement.isDirty !== undefined){
+        //if changed element is in Dirty check league
+        checkForDirty();
+      }
+      if(typeof changedElement.checkValidity == "function"){
+        checkForValidity();
+      }
+    },{passive:true});
   }
   #onAttributeChange(name: string, value: string) {
     // switch (name) {

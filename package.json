@@ -1,6 +1,6 @@
 {
   "name": "jb-form",
-  "description": "form web component with extended feature",
+  "description": "form web component with extended feature like validation and dirty check",
   "type": "module",
   "author": {
     "name": "mohammad javad bathaei",
@@ -11,10 +11,11 @@
     "jb-form",
     "form",
     "validation",
+    "dirty",
     "form web-component",
     "web-component"
   ],
-  "version": "0.1.0",
+  "version": "0.2.0",
   "bugs": "https://github.com/javadbat/jb-form/issues",
   "license": "MIT",
   "files": [
