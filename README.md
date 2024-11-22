@@ -166,7 +166,21 @@ jb-form add some new events to let you monitor your form in real time when somet
     setIsValid(e.detail.isValid);
   };
 ```
+## subform
 
+with jb-form you have ability to pace form tag inside another form and manage them individually or in overall.
+
+```html
+<form is="jb-form">
+  <form is="jb-form" name="form1">
+    <jb-input name="input1" />
+  </jb-form>
+  <form is="jb-form" name="form2">
+    <jb-input name="input2" />
+  </jb-form>
+</jb-form>
+```
+this really help you to manage pages that contain wizard forms or let separate forms in different components so your reusable component can have it's own form and still can be managed by parent page form.
 
 ## Other Related Docs:
 

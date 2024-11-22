@@ -222,7 +222,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     }
     for (const subForm of this.#subForms) {
       if (subForm.name && value[subForm.name] !== undefined) {
-        subForm.setFormValues(value[subForm.name]);
+        subForm.setFormValues(value[subForm.name],false);
       }
     }
     if (shouldUpdateInitialValue) {
@@ -243,6 +243,11 @@ export class JBFormWebComponent extends HTMLFormElement {
     for (const vElem of this.#virtualElements) {
       if (vElem.name && value[vElem.name] !== undefined && typeof vElem.setInitialValue == "function") {
         vElem.setInitialValue(value[vElem.name]);
+      }
+    }
+    for (const subForm of this.#subForms) {
+      if (subForm.name && value[subForm.name] !== undefined) {
+        subForm.setFormInitialValues(value[subForm.name],false);
       }
     }
     if (shouldUpdateValue) {
