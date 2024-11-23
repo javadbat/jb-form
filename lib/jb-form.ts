@@ -2,14 +2,15 @@ import { ExtractFunction, FormExtractFunction, FormValidationMessages, FormValid
 import { type WithValidation, ValidationHelper, ValidationItem } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
+import { SubFormList } from './sub-form-list';
 export * from './types';
 //TODO: add events for onDirtyChange or onValidationChange 
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
   #formReportValidity = this.reportValidity;
-  #virtualElements: VirtualElementList;
-  #subForms: JBFormWebComponent[] = [];
+  #virtualElements = new VirtualElementList({handleStateChanges:this.#handleStateChanges});
+  #subForms = new SubFormList();
   callbacks = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     showValidationError: (message: string) => { },
@@ -37,7 +38,10 @@ export class JBFormWebComponent extends HTMLFormElement {
     };
   }
   get subForms(){
-    return this.#subForms;
+    return {
+      list:this.#subForms.list,
+      dictionary:this.#subForms.dictionary,
+    };
   }
   constructor() {
     super();
@@ -117,7 +121,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       },
       {
         validator: () => {
-          const invalidForm = this.#subForms.find((item) => {
+          const invalidForm = this.#subForms.list.find((item) => {
             return !item.checkValidity();
           });
           if (invalidForm == undefined) {
@@ -150,7 +154,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       }
       return item.validation.checkValidity(true) && acc;
     }, true);
-    const formResult = this.#subForms.reduce((acc, item) => {
+    const formResult = this.#subForms.list.reduce((acc, item) => {
       return item.reportValidity() && acc;
     }, true);
     // isAllValid = isAllValid && this.#formReportValidity();
@@ -223,11 +227,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       }
     }
     this.#virtualElements.setValues(value);
-    for (const subForm of this.#subForms) {
-      if (subForm.name && value[subForm.name] !== undefined) {
-        subForm.setFormValues(value[subForm.name],false);
-      }
-    }
+    this.#subForms.setValues(value);
     if (shouldUpdateInitialValue) {
       this.setFormInitialValues(value, false);
     }
@@ -243,11 +243,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       }
     }
     this.#virtualElements.setInitialValues(value);
-    for (const subForm of this.#subForms) {
-      if (subForm.name && value[subForm.name] !== undefined) {
-        subForm.setFormInitialValues(value[subForm.name],false);
-      }
-    }
+    this.#subForms.setInitialValues(value);
     if (shouldUpdateValue) {
       this.setFormValues(value, false);
     }
@@ -264,21 +260,11 @@ export class JBFormWebComponent extends HTMLFormElement {
     }
     return result;
   }
-  #traverseSubFormElements<T>(extractFunction: FormExtractFunction<T>): TraverseResult<T> {
-    type ValueType = ReturnType<typeof extractFunction>;
-    const result: TraverseResult<ValueType> = {};
-    //make it partial so every callback function have to check for nullable properties
-    for (const formElement of this.#subForms) {
-      if (formElement.name) {
-        result[formElement.name] = extractFunction(formElement);
-      }
-    }
-    return result;
-  }
+
   #traverseNamedElements<T>(extractFunction: ExtractFunction<T>, virtualExtractFunction: VirtualExtractFunction<T>, formExtractFunction: FormExtractFunction<T>): TraverseResult<T> {
     const formElementResult = this.#traverseFormNamedElements(extractFunction);
     const virtualResult = this.#virtualElements.traverse(virtualExtractFunction);
-    const subFormResult = this.#traverseSubFormElements(formExtractFunction);
+    const subFormResult = this.#subForms.traverse(formExtractFunction);
     return { ...formElementResult, ...virtualResult, ...subFormResult };
   }
 
@@ -323,8 +309,8 @@ export class JBFormWebComponent extends HTMLFormElement {
    */
   #initJBFormTree() {
     this.addEventListener('init', (e) => {
-      if (e.target instanceof JBFormWebComponent && e.target !== this && !this.#subForms.includes(e.target)) {
-        this.#subForms.push(e.target);
+      if (e.target instanceof JBFormWebComponent && e.target !== this) {
+        this.#subForms.add(e.target);
       }
     });
   }

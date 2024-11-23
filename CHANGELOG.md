@@ -3,6 +3,7 @@
 ## [0.3.0] - 2024-11-20
 ### new features
 - create special `VirtualElementList` to handle virtual elements functionality.   
+- create special `subFormList` to handle sub forms elements functionality.   
 
 ## [0.2.0] - 2024-11-20
 ### new features
