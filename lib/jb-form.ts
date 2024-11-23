@@ -31,6 +31,9 @@ export class JBFormWebComponent extends HTMLFormElement {
   get virtualElements(){
     return this.#virtualElements;
   }
+  get subForms(){
+    return this.#subForms;
+  }
   constructor() {
     super();
     this.initWebComponent();
@@ -187,11 +190,11 @@ export class JBFormWebComponent extends HTMLFormElement {
  * @description returns key value object contains value of named element
  * @returns @public
  */
-  getFormValues(): FormValues {
+  getFormValues<TFormValue extends FormValues = FormValues>(): TFormValue {
     return this.#traverseNamedElements((formElement) => formElement.value,
       (vElement) => typeof vElement.getValue == "function" ? vElement.getValue() : null,
       (subForm) => subForm.getFormValues(),
-    );
+    ) as TFormValue;
   }
   /**
 * @description returns key value object contains dirty status of named element
@@ -206,9 +209,8 @@ export class JBFormWebComponent extends HTMLFormElement {
   /**
 * @description set value of named form input elements
 * @param shouldUpdateInitialValue determine if we should also update initial value or not. pass false if you want initialValue remain untouched
-* @returns @public
 */
-  setFormValues(value: FormValues, shouldUpdateInitialValue = true) {
+  setFormValues<TFormValue extends FormValues = FormValues>(value: TFormValue, shouldUpdateInitialValue = true) {
     for (const elem of this.elements) {
       const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
       if (formElement.name && value[formElement.name] !== undefined) {
@@ -231,9 +233,8 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   /**
 * @description set initial value of named form input elements used for dirty field detection
-* @returns @public
 */
-  setFormInitialValues(value: FormValues, shouldUpdateValue = true) {
+  setFormInitialValues<TFormValue extends FormValues = FormValues>(value: TFormValue, shouldUpdateValue = true) {
     for (const elem of this.elements) {
       const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
       if (formElement.name && value[formElement.name] !== undefined) {
