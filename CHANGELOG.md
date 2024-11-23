@@ -1,5 +1,9 @@
 # changelog
 
+## [0.3.0] - 2024-11-20
+### new features
+- create special `VirtualElementList` to handle virtual elements functionality.   
+
 ## [0.2.0] - 2024-11-20
 ### new features
 - add `dirty-change` event to notify user about dirty status change in form elements.   

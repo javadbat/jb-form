@@ -1,13 +1,14 @@
 import { ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualElementConfig, VirtualExtractFunction } from './types';
 import { type WithValidation, ValidationHelper, ValidationItem } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
+import { VirtualElementList } from './virtual-element-list';
 export * from './types';
 //TODO: add events for onDirtyChange or onValidationChange 
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
   #formReportValidity = this.reportValidity;
-  #virtualElements: VirtualElement<any, any>[] = [];
+  #virtualElements: VirtualElementList;
   #subForms: JBFormWebComponent[] = [];
   callbacks = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -29,7 +30,11 @@ export class JBFormWebComponent extends HTMLFormElement {
     return this.getFormValues();
   }
   get virtualElements(){
-    return this.#virtualElements;
+    return {
+      list:this.#virtualElements.list,
+      dictionary:this.#virtualElements.dictionary,
+      add:this.#virtualElements.add
+    };
   }
   get subForms(){
     return this.#subForms;
@@ -96,7 +101,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       },
       {
         validator: () => {
-          const invalidElement = this.#virtualElements.find((item) => {
+          const invalidElement = this.#virtualElements.list.find((item) => {
             if (typeof item.validation?.checkValidity !== "function") {
               return false;
             }
@@ -139,7 +144,7 @@ export class JBFormWebComponent extends HTMLFormElement {
         isAllValid = element.reportValidity() && isAllValid;
       }
     }
-    const virtualResult = this.#virtualElements.reduce((acc, item) => {
+    const virtualResult = this.#virtualElements.list.reduce((acc, item) => {
       if (typeof item.validation?.checkValidity !== "function") {
         return acc;
       }
@@ -217,11 +222,7 @@ export class JBFormWebComponent extends HTMLFormElement {
         formElement.value = value[formElement.name];
       }
     }
-    for (const vElem of this.#virtualElements) {
-      if (vElem.name && value[vElem.name] !== undefined && typeof vElem.setValue == "function") {
-        vElem.setValue(value[vElem.name]);
-      }
-    }
+    this.#virtualElements.setValues(value);
     for (const subForm of this.#subForms) {
       if (subForm.name && value[subForm.name] !== undefined) {
         subForm.setFormValues(value[subForm.name],false);
@@ -241,11 +242,7 @@ export class JBFormWebComponent extends HTMLFormElement {
         formElement.initialValue = value[formElement.name];
       }
     }
-    for (const vElem of this.#virtualElements) {
-      if (vElem.name && value[vElem.name] !== undefined && typeof vElem.setInitialValue == "function") {
-        vElem.setInitialValue(value[vElem.name]);
-      }
-    }
+    this.#virtualElements.setInitialValues(value);
     for (const subForm of this.#subForms) {
       if (subForm.name && value[subForm.name] !== undefined) {
         subForm.setFormInitialValues(value[subForm.name],false);
@@ -280,35 +277,11 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   #traverseNamedElements<T>(extractFunction: ExtractFunction<T>, virtualExtractFunction: VirtualExtractFunction<T>, formExtractFunction: FormExtractFunction<T>): TraverseResult<T> {
     const formElementResult = this.#traverseFormNamedElements(extractFunction);
-    const virtualResult = this.#traverseVirtualElement(virtualExtractFunction);
+    const virtualResult = this.#virtualElements.traverse(virtualExtractFunction);
     const subFormResult = this.#traverseSubFormElements(formExtractFunction);
     return { ...formElementResult, ...virtualResult, ...subFormResult };
   }
-  /**
-   * @public add virtual element let you register some non standard form element into this form to activate all form helpers and methods for them
-   * @param element the element you want to register
-   */
-  addVirtualElement<TValue, TValidationValue>(config: VirtualElementConfig<TValue, TValidationValue>) {
-    const VElement = new VirtualElement(config);
-    VElement.attachCallbacks({onChange:()=>this.#handleStateChanges(VElement)});
-    this.#virtualElements.push(VElement);
-    return VElement;
-  }
-  /**
-   * will traverse all virtual inputs and return object of requested data
-   * @param extractFunction 
-   */
-  #traverseVirtualElement<T>(extractFunction: VirtualExtractFunction<T>) {
-    type ValueType = ReturnType<typeof extractFunction>;
-    const result: TraverseResult<ValueType> = {};
-    //make it partial so every callback function have to check for nullable properties
-    for (const formElement of this.#virtualElements) {
-      if (formElement.name) {
-        result[formElement.name] = extractFunction(formElement);
-      }
-    }
-    return result;
-  }
+
   //keep dirty status from the last time check.
   #prevIsDirty = false;
   #prevValidity = this.checkValidity();

@@ -117,7 +117,7 @@ for doing so you just need to call `addVirtualElement` function:
 ```typescript
 // here is type of VirtualElement you need to build
 //TValue is the component normal value you always want to get and TValidationValue is the value you want to pass to validation module validators. they may be the same type or not base on your component 
-type VirtualElement<TValue,TValidationValue> = {
+type VirtualElementConfig<TValue,TValidationValue> = {
   //name of the field in all result returns. it's required.
   name:string,
   //jb-validation standard ValidationHelper object. if not provided all validation methods will skip this input
@@ -141,6 +141,10 @@ const tagList:VirtualElement<string[],string[]> = {
   setValue(newValue)=>{ list= newValue },
   setInitialValue(newValue)=>{ initialList= newValue },
 }
+
+// adding virtualElements
+form.virtualElements.add(tagList);
+
 ```
 
 ## Events
