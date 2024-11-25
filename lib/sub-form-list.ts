@@ -7,7 +7,7 @@ export class SubFormList {
     return [...this.#list] as const;
   }
   get dictionary(){
-    return Object.freeze(this.#dictionary);
+    return Object.freeze({...this.#dictionary});
   }
   setValues<TFormValue extends FormValues = FormValues>(value: TFormValue){
     for (const subForm of this.#list) {
