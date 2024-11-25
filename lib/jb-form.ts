@@ -34,7 +34,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     return {
       list:this.#virtualElements.list,
       dictionary:this.#virtualElements.dictionary,
-      add:this.#virtualElements.add
+      add:this.#virtualElements.add.bind(this.#virtualElements)
     };
   }
   get subForms(){

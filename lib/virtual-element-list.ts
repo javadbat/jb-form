@@ -15,7 +15,7 @@ export class VirtualElementList {
     return [...this.#list] as const;
   }
   get dictionary(){
-    return Object.freeze(this.#dictionary);
+    return Object.freeze({...this.#dictionary});
   }
   setValues<TFormValue extends FormValues = FormValues>(value: TFormValue) {
     for (const vElem of this.#list) {
