@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useImperativeHandle } from 'react';
-import {JBFormWebComponent} from 'jb-form'
+import React, { useCallback, useImperativeHandle } from 'react';
+import {JBFormWebComponent} from 'jb-form';
 import { useBindEvent } from '../../../../common/hooks/use-event.js';
 type Props = React.HTMLProps<HTMLFormElement> & {
  onSubmit:(e:SubmitEvent)=>void
