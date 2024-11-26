@@ -1,0 +1,33 @@
+{
+  "name": "jb-form/react",
+  "description": "jb form react component bridge",
+  "type": "module",
+  "author": {
+    "name": "mohammad javad bathaei",
+    "email": "javadbat@gmail.com"
+  },
+  "keywords": [
+    "jb",
+    "jb-form",
+    "form",
+    "validation",
+    "dirty",
+    "form web-component",
+    "web-component"
+  ],
+  "version": "0.0.1",
+  "bugs": "https://github.com/javadbat/jb-form/issues",
+  "license": "MIT",
+  "sideEffects": ["*.js"],
+  "main": "index.js",
+  "module": "index.js",
+  "homepage": "https://github.com/javadbat/jb-form",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/javadbat/jb-form"
+  },
+  "types": "",
+  "dependencies": {
+
+  }
+}
