@@ -4,7 +4,6 @@ import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
 export * from './types';
-//TODO: add events for onDirtyChange or onValidationChange 
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
@@ -32,9 +31,9 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   get virtualElements(){
     return {
-      list:this.#virtualElements.list,
-      dictionary:this.#virtualElements.dictionary,
-      add:this.#virtualElements.add.bind(this.#virtualElements)
+      list:this.#virtualElements.list as ReadonlyArray<VirtualElement<any,any>>,
+      dictionary:this.#virtualElements.dictionary as Readonly< Record<string,VirtualElement<any,any>>>,
+      add:this.#virtualElements.add
     };
   }
   get subForms(){

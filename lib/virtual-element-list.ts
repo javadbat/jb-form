@@ -35,7 +35,7 @@ export class VirtualElementList {
  * @public add virtual element let you register some non standard form element into this form to activate all form helpers and methods for them
  * @param element the element you want to register
  */
-  add<TValue, TValidationValue>(config: VirtualElementConfig<TValue, TValidationValue>) {
+  add =<TValue, TValidationValue>(config: VirtualElementConfig<TValue, TValidationValue>)=>{
     const VElement = new VirtualElement(config);
     VElement.attachCallbacks({ onChange: () => this.#callbacks.handleStateChanges(VElement) });
     this.#list.push(VElement);
