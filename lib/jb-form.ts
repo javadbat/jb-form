@@ -21,7 +21,14 @@ export class JBFormWebComponent extends HTMLFormElement {
   get validation() {
     return this.#validation;
   }
-  #validation = new ValidationHelper<ValidationValue>(this.callbacks.showValidationError, this.callbacks.cleanValidationError, this.getFormValues.bind(this), () => JSON.stringify(this.getFormValues()), this.#getInsideValidations.bind(this), this.callbacks.setValidationResult)
+  #validation = new ValidationHelper<ValidationValue>({
+    showValidationError:this.callbacks.showValidationError.bind(this),
+    clearValidationError:this.callbacks.cleanValidationError.bind(this),
+    getInputtedValue:this.getFormValues.bind(this),
+    getInsideValidations:this.#getInsideValidations.bind(this),
+    getValueString:(value)=>JSON.stringify(value),
+    setValidationResult:this.callbacks.setValidationResult
+  })
   get isDirty(): boolean {
     const res = this.getFormDirtyStatus();
     return Object.values(res).reduce((acc, val) => acc || val, false);
@@ -108,7 +115,7 @@ export class JBFormWebComponent extends HTMLFormElement {
             if (typeof item.validation?.checkValidity !== "function") {
               return false;
             }
-            return !item.validation.checkValidity(false);
+            return !item.validation.checkValidity({showError:false});
           });
           if (invalidElement == undefined) {
             return true;
@@ -135,7 +142,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   #checkValidity(): boolean {
     //
-    return this.#validation.checkValidity(false).isAllValid;
+    return this.#validation.checkValiditySync({showError:false}).isAllValid;
   }
   #reportValidity(): boolean {
     //we dont use this.#validation because validation methods design to find first error and keep it but here we need to show every error on components 
@@ -151,7 +158,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       if (typeof item.validation?.checkValidity !== "function") {
         return acc;
       }
-      return item.validation.checkValidity(true) && acc;
+      return item.validation.checkValiditySync({showError:true}) && acc;
     }, true);
     const formResult = this.#subForms.list.reduce((acc, item) => {
       return item.reportValidity() && acc;
