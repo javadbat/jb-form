@@ -15,7 +15,7 @@
     "form web-component",
     "web-component"
   ],
-  "version": "0.4.0",
+  "version": "0.5.7",
   "bugs": "https://github.com/javadbat/jb-form/issues",
   "license": "MIT",
   "files": [
@@ -23,7 +23,8 @@
     "README.md",
     "lib/",
     "lib/types.ts",
-    "dist/"
+    "dist/",
+    "react/"
   ],
   "sideEffects": ["*.js"],
   "main": "index.js",
