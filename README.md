@@ -78,10 +78,15 @@ form.getValidationMessages();
 form.getValidationSummary();
 // will return key value object of *named* element with error full report (null if element not implement jb-validation standard) works only for custom element that implement jb-validation standards
 form.getValidationResult();
+// this method will validate all your jb-validation compatible (web-components,virtual elements, jb-forms) with all their async validations. it has the most rich result and have tree data structure for tree forms and even validate elements without name.
+// take care that this method don't validate non jb-validations element like form input or select and will only support jb-validations standard methods
+await form.jbCheckValidity({showError:true});
 ```
-all jb design system support [jb-validation](https://github.com/javadbat/jb-validation) so dont worry about them if you want to use `getValidationSummary` or `getValidationResult`.    
-just check that your element must have `name` attribute in its HTML `<jb-input name="something"/>`.
+all jb design system support [jb-validation](https://github.com/javadbat/jb-validation) so don't worry about them. if you want to use `getValidationSummary` or `getValidationResult`.    
+just check that your element must have `name` attribute in its HTML like: `<jb-input name="something"/>`.
 if you have a form element that dont support [jb-validation](https://github.com/javadbat/jb-validation) you can easily create a custom element that implements `WithValidation<ValidationValue>` interface. for more detail read [jb-validation](https://github.com/javadbat/jb-validation) doc.
+> [!IMPORTANT]
+> `jbCheckValidity` is the only method that supports Async validations so if you have async validations in your form use this method. it also use `Map<Element,Result>` in it's results so you could access the elements DOM easier with this method. this method has the most complicated but most rich results for advance usages.
 
 ## value control
 

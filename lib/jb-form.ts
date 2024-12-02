@@ -1,4 +1,4 @@
-import { ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualElementConfig, VirtualExtractFunction } from './types';
+import { JBCheckValidityParameter, CheckValidityAsyncResult, ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualElementConfig, VirtualExtractFunction } from './types';
 import { type WithValidation, ValidationHelper, ValidationItem } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
@@ -8,7 +8,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
   #formReportValidity = this.reportValidity;
-  #virtualElements = new VirtualElementList({handleStateChanges:this.#handleStateChanges});
+  #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges });
   #subForms = new SubFormList();
   callbacks = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -16,18 +16,18 @@ export class JBFormWebComponent extends HTMLFormElement {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     cleanValidationError: () => { },
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    setValidationResult:()=>{ }
+    setValidationResult: () => { }
   }
   get validation() {
     return this.#validation;
   }
   #validation = new ValidationHelper<ValidationValue>({
-    showValidationError:this.callbacks.showValidationError.bind(this),
-    clearValidationError:this.callbacks.cleanValidationError.bind(this),
-    getInputtedValue:this.getFormValues.bind(this),
-    getInsideValidations:this.#getInsideValidations.bind(this),
-    getValueString:(value)=>JSON.stringify(value),
-    setValidationResult:this.callbacks.setValidationResult
+    showValidationError: this.callbacks.showValidationError.bind(this),
+    clearValidationError: this.callbacks.cleanValidationError.bind(this),
+    getInputtedValue: this.getFormValues.bind(this),
+    getInsideValidations: this.#getInsideValidations.bind(this),
+    getValueString: (value) => JSON.stringify(value),
+    setValidationResult: this.callbacks.setValidationResult
   })
   get isDirty(): boolean {
     const res = this.getFormDirtyStatus();
@@ -36,17 +36,17 @@ export class JBFormWebComponent extends HTMLFormElement {
   get value() {
     return this.getFormValues();
   }
-  get virtualElements(){
+  get virtualElements() {
     return {
-      list:this.#virtualElements.list as ReadonlyArray<VirtualElement<any,any>>,
-      dictionary:this.#virtualElements.dictionary as Readonly< Record<string,VirtualElement<any,any>>>,
-      add:this.#virtualElements.add
+      list: this.#virtualElements.list as ReadonlyArray<VirtualElement<any, any>>,
+      dictionary: this.#virtualElements.dictionary as Readonly<Record<string, VirtualElement<any, any>>>,
+      add: this.#virtualElements.add
     };
   }
-  get subForms(){
+  get subForms() {
     return {
-      list:this.#subForms.list,
-      dictionary:this.#subForms.dictionary,
+      list: this.#subForms.list,
+      dictionary: this.#subForms.dictionary,
     };
   }
   constructor() {
@@ -115,7 +115,7 @@ export class JBFormWebComponent extends HTMLFormElement {
             if (typeof item.validation?.checkValidity !== "function") {
               return false;
             }
-            return !item.validation.checkValidity({showError:false});
+            return !item.validation.checkValidity({ showError: false });
           });
           if (invalidElement == undefined) {
             return true;
@@ -142,7 +142,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   #checkValidity(): boolean {
     //
-    return this.#validation.checkValiditySync({showError:false}).isAllValid;
+    return this.#validation.checkValiditySync({ showError: false }).isAllValid;
   }
   #reportValidity(): boolean {
     //we dont use this.#validation because validation methods design to find first error and keep it but here we need to show every error on components 
@@ -158,7 +158,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       if (typeof item.validation?.checkValidity !== "function") {
         return acc;
       }
-      return item.validation.checkValiditySync({showError:true}) && acc;
+      return item.validation.checkValiditySync({ showError: true }) && acc;
     }, true);
     const formResult = this.#subForms.list.reduce((acc, item) => {
       return item.reportValidity() && acc;
@@ -169,6 +169,42 @@ export class JBFormWebComponent extends HTMLFormElement {
   #dispatchSubmitEvent(e: SubmitEvent) {
     const event = new SubmitEvent('submit', { ...e });
     this.dispatchEvent(event);
+  }
+  /**
+   * @description this function will check all standard jb validations includes async validations virtual elements and sub forms. it have most rich validation result betweens jb-form validation results methods
+   *  @public
+   */
+  async jbCheckValidity(params: JBCheckValidityParameter) {
+    const result: CheckValidityAsyncResult = {
+      isAllValid: true,
+      elements: new Map(),
+      virtualElements: new Map(),
+      subForms:new Map()
+    };
+    //check for elements
+    for (const elem of this.elements) {
+      const element = elem as unknown as WithValidation & HTMLElement;
+      if (typeof element.validation?.checkValidity == "function") {
+        const res = await element.validation.checkValidity({ showError: params.showError });
+        result.isAllValid = res.isAllValid && result.isAllValid;
+        result.elements.set(element, res);
+      }
+    }
+    // check for virtual elements
+    for (const vElement of this.#virtualElements.list) {
+      if (typeof vElement.validation?.checkValidity === "function") {
+        const res = await vElement.validation.checkValidity({ showError: params.showError });
+        result.isAllValid = res.isAllValid && result.isAllValid;
+        result.virtualElements.set(vElement, res);
+      }
+    }
+    //check for sub forms
+    for (const subForm of this.#subForms.list) {
+      const res = await subForm.jbCheckValidityAsync(params);
+      result.isAllValid = res.isAllValid && result.isAllValid;
+      result.subForms.set(subForm, res);
+    }
+    return result;
   }
   /**
    * @description returns key value object contains validation message of named element
@@ -277,7 +313,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   //keep dirty status from the last time check.
   #prevIsDirty = false;
   #prevValidity = this.checkValidity();
-  #handleStateChanges(element: Partial<JBFormInputStandards & WithValidation> | VirtualElement<any,any>) {
+  #handleStateChanges(element: Partial<JBFormInputStandards & WithValidation> | VirtualElement<any, any>) {
     const checkForDirty = () => {
       const currentIsDirty = this.isDirty;
       if (currentIsDirty !== this.#prevIsDirty) {
@@ -296,11 +332,11 @@ export class JBFormWebComponent extends HTMLFormElement {
         this.#prevValidity = currentValidity;
       }
     };
-    if(element instanceof VirtualElement){
+    if (element instanceof VirtualElement) {
       checkForDirty();
       checkForValidity();
       return;
-    }else{
+    } else {
       if (element.isDirty !== undefined) {
         //if changed element is in Dirty check league
         checkForDirty();
@@ -325,27 +361,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     this.dispatchEvent(event);
   }
   #onAttributeChange(name: string, value: string) {
-    // switch (name) {
-    //   case 'isLoading':
-    //     this.isLoading = Boolean(value);
-    //     break;
-    //   case 'loading-text':
-    //     this.loadingText = value;
-    //     break;
-    //   case 'type':
-    //     this.elements!.button.setAttribute('type', value);
-    //     break;
-    //   case 'button-style':
-    //     this.elements!.button.setAttribute('style', value);
-    //     break;
-    //   case 'disabled':
-    //     if (value == "true" || value == "" || value == "disabled") {
-    //       this.elements!.button.setAttribute('disabled', "disabled");
-    //     } else {
-    //       this.elements!.button.removeAttribute('disabled');
-    //     }
-    //     break;
-    // }
+    //TODO: add attrubutes to watch
   }
 }
 const myElementNotExists = !customElements.get('jb-form');

@@ -4,6 +4,7 @@ import { VirtualElementCallbacks, VirtualElementConfig } from "./types";
 export class VirtualElement <TValue, TValidationValue> {
   name:string;
   validation?:ValidationHelper<TValidationValue>;
+  dom?:HTMLElement;
   getValue?:()=>TValue;
   getDirtyStatus?:()=>boolean;
   setValue?:(value:TValue)=>void;
@@ -14,6 +15,7 @@ export class VirtualElement <TValue, TValidationValue> {
   constructor(config:VirtualElementConfig<TValue, TValidationValue>){
     this.name = config.name;
     this.validation = config.validation;
+    this.dom = config.dom;
     this.getDirtyStatus = config.getDirtyStatus;
     this.getValue = config.getValue;
     this.setInitialValue = config.setInitialValue;

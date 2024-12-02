@@ -1,5 +1,10 @@
 # changelog
 
+## [0.6.0] - 2024-11-20
+### new features
+- add `jbCheckValidity` to support async validations.   
+- add `dom` to virtual elements for easier manipulations.   
+
 ## [0.3.0] - 2024-11-20
 ### new features
 - create special `VirtualElementList` to handle virtual elements functionality.   
