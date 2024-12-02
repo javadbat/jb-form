@@ -200,7 +200,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     }
     //check for sub forms
     for (const subForm of this.#subForms.list) {
-      const res = await subForm.jbCheckValidityAsync(params);
+      const res = await subForm.jbCheckValidity(params);
       result.isAllValid = res.isAllValid && result.isAllValid;
       result.subForms.set(subForm, res);
     }
