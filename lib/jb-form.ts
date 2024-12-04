@@ -24,8 +24,8 @@ export class JBFormWebComponent extends HTMLFormElement {
   #validation = new ValidationHelper<ValidationValue>({
     showValidationError: this.callbacks.showValidationError.bind(this),
     clearValidationError: this.callbacks.cleanValidationError.bind(this),
-    getInputtedValue: this.getFormValues.bind(this),
-    getInsideValidations: this.#getInsideValidations.bind(this),
+    getValue: this.getFormValues.bind(this),
+    getValidations: this.#getInsideValidations.bind(this),
     getValueString: (value) => JSON.stringify(value),
     setValidationResult: this.callbacks.setValidationResult
   })
