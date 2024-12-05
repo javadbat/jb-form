@@ -9,7 +9,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
   #formReportValidity = this.reportValidity;
-  #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges });
+  #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges.bind(this) });
   #subForms = new SubFormList();
   callbacks = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -32,7 +32,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   })
   get isDirty(): boolean {
     const res = this.getFormDirtyStatus();
-    return Object.values(res).reduce((acc, val) => acc || val, false);
+    return Object.values(res).includes(true);
   }
   get value() {
     return this.getFormValues();
