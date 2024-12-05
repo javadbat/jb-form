@@ -2,6 +2,9 @@ import React, { useCallback, useImperativeHandle } from 'react';
 import { type JBFormWebComponent } from 'jb-form';
 import { useBindEvent } from '../../../../common/hooks/use-event.js';
 import { JBFormProvider } from './context.js';
+
+export * from './context.js';
+
 type Props = React.HTMLProps<HTMLFormElement> & {
   onSubmit?: (e: SubmitEvent) => void
   onDirtyChange?: (e: CustomEvent) => void

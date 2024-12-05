@@ -1,6 +1,6 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import {type JBFormWebComponent } from "jb-form";
 
-export const JBFormContext = createContext<JBFormWebComponent|null>(null);
+export const JBFormContext = createContext<JBFormWebComponent | null>(null);
 export const JBFormProvider = JBFormContext.Provider;
-export const useJBForm = JBFormContext.Consumer;
+export const useJBForm = ():JBFormWebComponent|null=>useContext(JBFormContext);
