@@ -334,6 +334,8 @@ export class JBFormWebComponent extends HTMLFormElement {
       }
     };
     if (element instanceof VirtualElement) {
+      //because `dirty-change` event does not bubble we must trigger form change so upper form can get new isDirty or validity value 
+      this.#dispatchOnChange();
       checkForDirty();
       checkForValidity();
       return;
@@ -359,6 +361,10 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   #dispatchJBFormInit() {
     const event = new CustomEvent("init", { bubbles: true, composed: true, cancelable: false });
+    this.dispatchEvent(event);
+  }
+  #dispatchOnChange() {
+    const event = new Event("change",{bubbles:true,cancelable:false,composed:true});
     this.dispatchEvent(event);
   }
   #onAttributeChange(name: string, value: string) {
