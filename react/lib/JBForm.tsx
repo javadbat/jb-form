@@ -1,4 +1,6 @@
 import React, { useCallback, useImperativeHandle } from 'react';
+import 'jb-form';
+// eslint-disable-next-line no-duplicate-imports
 import { type JBFormWebComponent } from 'jb-form';
 import { useBindEvent } from '../../../../common/hooks/use-event.js';
 import { JBFormProvider } from './context.js';
