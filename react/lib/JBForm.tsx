@@ -23,22 +23,22 @@ export const JBForm = React.forwardRef((props: Props, ref: React.ForwardedRef<JB
     if (typeof onSubmit == "function") {
       onSubmit(e);
     }
-  }, [onSubmit]);
+  }, [onSubmit,element]);
   const onValidityChangeFunc = useCallback((e: CustomEvent) => {
     if (typeof onValidityChange == "function") {
       onValidityChangeFunc(e);
     }
-  }, [onSubmit]);
+  }, [onSubmit,element]);
   const onDirtyChangeFunc = useCallback((e: CustomEvent) => {
     if (typeof onDirtyChange == "function") {
       onDirtyChange(e);
     }
-  }, [onSubmit]);
+  }, [onSubmit,element]);
   useBindEvent(element, "submit", onSubmitFunc);
   useBindEvent(element, "dirty-change", onDirtyChangeFunc);
   useBindEvent(element, "validity-change", onValidityChangeFunc);
   return (
-    <form ref={element} is="jb-form" {...formProps}>
+    <form is="jb-form" ref={element} {...formProps}>
       <JBFormProvider value={element.current??null}>
         {
           children

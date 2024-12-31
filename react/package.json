@@ -28,6 +28,6 @@
   },
   "types": "./dist/web-component/jb-form/react/lib/JBForm.d.ts",
   "dependencies": {
-    "jb-form":"file:../index.js"
+    "jb-form":">=0.6.10"
   }
 }
