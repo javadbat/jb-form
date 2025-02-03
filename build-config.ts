@@ -22,5 +22,7 @@ export const reactComponentList: ReactComponentBuildConfig[] = [
       'react': "React",
       'jb-form': "JBForm",
     },
+    umdName:"JBFormReact",
+    dir:"./react"
   },
 ];
