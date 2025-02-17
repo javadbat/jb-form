@@ -1,7 +1,7 @@
 import type { ValidationResult, ValidationResultSummary, WithValidation, ValidationHelper } from "jb-validation";
 import { type JBFormWebComponent } from "./jb-form";
 import { type VirtualElement } from "./virtual-element";
-
+import type {EventTypeWithTarget} from 'jb-core';
 //indicate which property is essential for element to be jb-form compatible 
 export interface JBFormInputStandards<TValue = string> {
   disabled: boolean,
@@ -96,3 +96,5 @@ export type CheckValidityAsyncResult = {
 */
   subForms: Map<JBFormWebComponent, CheckValidityAsyncResult>;
 }
+
+export type JBFormEventType<TEvent> = EventTypeWithTarget<TEvent,JBFormWebComponent>;

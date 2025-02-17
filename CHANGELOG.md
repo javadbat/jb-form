@@ -1,4 +1,7 @@
 # changelog
+## [0.6.13] - 2024-2-17
+### core:
+- standard event base on jb design system new events hook in react component.
 
 ## [0.6.0] - 2024-11-20
 ### new features
