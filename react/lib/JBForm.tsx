@@ -7,8 +7,10 @@ import { JBFormProvider } from './context.js';
 
 export * from './context.js';
 
-type Props = React.HTMLProps<HTMLFormElement> & EventProps
+export type Props = React.HTMLProps<JBFormWebComponent> & EventProps;
+
 export * from './context.js';
+
 export const JBForm = React.forwardRef((props: Props, ref: React.ForwardedRef<JBFormWebComponent | undefined>) => {
   const { onSubmit, onValidityChange, onDirtyChange, children, ...formProps } = props;
   const element = React.useRef<JBFormWebComponent>(null);
@@ -18,7 +20,7 @@ export const JBForm = React.forwardRef((props: Props, ref: React.ForwardedRef<JB
     [element],
   );
 
-  useEvents(element,props);
+  useEvents(element,{onSubmit, onValidityChange, onDirtyChange});
 
   return (
     <form is="jb-form" ref={element} {...formProps}>
@@ -30,4 +32,5 @@ export const JBForm = React.forwardRef((props: Props, ref: React.ForwardedRef<JB
     </form>
   );
 });
+
 JBForm.displayName = "JBForm";
