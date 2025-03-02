@@ -34,9 +34,9 @@
     "type": "git",
     "url": "https://github.com/javadbat/jb-form"
   },
-  "types": "./dist/web-component/jb-form/lib/jb-form.d.ts",
+  "types": "./dist/jb-form.d.ts",
   "dependencies": {
     "jb-validation":"^0.2.0",
-    "jb-core":"^0.1.0"
+    "jb-core":">=0.3.0"
   }
 }
