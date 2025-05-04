@@ -10,7 +10,7 @@ import type { JBFormWebComponent } from "jb-form";
 
 
 const meta: Meta<Props> = {
-  title: "Example/form elements/JBForm",
+  title: "Components/form elements/JBForm",
   component: JBForm,
 };
 export default meta;
