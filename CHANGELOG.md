@@ -1,4 +1,10 @@
 # changelog
+
+## [0.6.14] - 2025-5-18
+### fixes:
+- fix internal node modules folder on npm build
+
+
 ## [0.6.13] - 2024-2-17
 ### core:
 - standard event base on jb design system new events hook in react component.
