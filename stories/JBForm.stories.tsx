@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { JBButton } from "jb-button/react";
 import 'jb-form';
+import { getInvalidElements } from 'jb-form';
 import { JBForm, Props } from 'jb-form/react';
 import { PersonForm, BankForm } from "./samples/TestForms";
 import type { Meta, StoryObj } from '@storybook/react';
@@ -73,7 +74,7 @@ export const FormTest: Story = {
   }
 };
 
-export const FormTreeTest:Story = {
+export const FormTreeTest: Story = {
   render:
     (args) => {
       const ref = useRef<JBFormWebComponent>(null);
@@ -108,6 +109,41 @@ export const FormTreeTest:Story = {
           <div>isDirty:{isDirty ? 'dirty' : 'clean'}</div>
           <div>isValid:{isValid ? 'valid' : 'invalid'}</div>
         </form>
+
+      );
+    },
+  args: {
+    name: "parent-form",
+  }
+};
+
+export const SpotInvalidElementTest: Story = {
+  render:
+    (args) => {
+      const ref = useRef<JBFormWebComponent>(null);
+      const shakeInvalid = async () => {
+        const res = await ref.current!.jbCheckValidity({ showError: true });
+        const elements = getInvalidElements(res);
+        elements.forEach(el => {
+          el.animate([
+            { transform: "rotate(0deg)", display:'block' },
+            { transform: "rotate(2deg)", display:'block' },
+            { transform: "rotate(-2deg)", display:'block' },
+            { transform: "rotate(0deg)", display:'block' },
+          ],{duration:100,iterations:10,fill:'auto'})
+        })
+      }
+      return (
+        <JBForm ref={ref} {...args} style={{ display: 'flex', flexDirection: "column", gap: '1rem' }}>
+          <JBForm name="personForm">
+            <PersonForm></PersonForm>
+          </JBForm>
+          <hr></hr>
+          <JBForm name="bank-form">
+            <BankForm />
+          </JBForm>
+          <JBButton onClick={shakeInvalid}>shake invalids</JBButton>
+        </JBForm>
 
       );
     },

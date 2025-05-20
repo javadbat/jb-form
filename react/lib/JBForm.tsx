@@ -1,4 +1,4 @@
-import React, { useImperativeHandle } from 'react';
+import React, { useEffect, useImperativeHandle } from 'react';
 import 'jb-form';
 // eslint-disable-next-line no-duplicate-imports
 import { type JBFormWebComponent } from 'jb-form';
@@ -12,7 +12,7 @@ export type Props = React.HTMLProps<JBFormWebComponent> & EventProps;
 export * from './context.js';
 
 export const JBForm = React.forwardRef((props: Props, ref: React.ForwardedRef<JBFormWebComponent | undefined>) => {
-  const { onSubmit, onValidityChange, onDirtyChange, children, ...formProps } = props;
+  const { onSubmit, name, onValidityChange, onDirtyChange, children, ...formProps } = props;
   const element = React.useRef<JBFormWebComponent>(null);
   useImperativeHandle(
     ref,
@@ -21,7 +21,15 @@ export const JBForm = React.forwardRef((props: Props, ref: React.ForwardedRef<JB
   );
 
   useEvents(element,{onSubmit, onValidityChange, onDirtyChange});
-
+  useEffect(()=>{
+    if(element.current){
+      if(name){
+        element.current.setAttribute('name',name)
+      }else{
+        element.current.removeAttribute('name')
+      }
+    }
+  },[element.current, name])
   return (
     <form is="jb-form" ref={element} {...formProps}>
       <JBFormProvider value={element.current??null}>
