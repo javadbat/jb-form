@@ -1,5 +1,9 @@
 # changelog
 
+## [0.7.0] - 2025-05-21
+### new features
+- add `getInvalidElements` functions to get invalid elements dom.
+
 ## [0.6.14] - 2025-5-18
 ### fixes:
 - fix internal node modules folder on npm build

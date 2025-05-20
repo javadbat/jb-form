@@ -70,7 +70,7 @@ const isFormValid2 = document.querySelector('form').reportValidity();
 one of the `jb-form` extended feature is a more detailed validation report than standard form element.
 here is the functions:
 
-```js
+```javascript
 const form = document.querySelector('form');
 // will return key value object of *named* element with error message ('' if element value is valid) works for all form standards element like HTML input
 form.getValidationMessages();
@@ -80,7 +80,9 @@ form.getValidationSummary();
 form.getValidationResult();
 // this method will validate all your jb-validation compatible (web-components,virtual elements, jb-forms) with all their async validations. it has the most rich result and have tree data structure for tree forms and even validate elements without name.
 // take care that this method don't validate non jb-validations element like form input or select and will only support jb-validations standard methods
-await form.jbCheckValidity({showError:true});
+const res = await form.jbCheckValidity({showError:true});
+//this method will extract HTML Dom of invalid form elements (for virtual element you must provide dom when define it)
+const elements = getInvalidElements(res);
 ```
 all jb design system support [jb-validation](https://github.com/javadbat/jb-validation) so don't worry about them. if you want to use `getValidationSummary` or `getValidationResult`.    
 just check that your element must have `name` attribute in its HTML like: `<jb-input name="something"/>`.
@@ -175,7 +177,7 @@ jb-form add some new events to let you monitor your form in real time when somet
     setIsValid(e.detail.isValid);
   };
 ```
-## subform
+## sub form
 
 with jb-form you have ability to pace form tag inside another form and manage them individually or in overall.
 
