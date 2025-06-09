@@ -9,7 +9,7 @@ import { JBImageInput } from "jb-image-input/react";
 const genderList = ["male","female"];
 export function PersonForm() {
   return (
-    <div>
+    <div style={{display:'flex',flexDirection:'column', gap:'1rem'}}>
       <JBInput name="name" required label="نام" />
       <JBDateInput name="birthDate" required label="تاریخ تولد" format="YYYY-MM-DD" />
       <JBDateInput name="applyDate" required label="apply date" />
