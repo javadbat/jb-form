@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useImperativeHandle } from 'react';
 import 'jb-form';
 // eslint-disable-next-line no-duplicate-imports
