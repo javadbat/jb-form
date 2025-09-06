@@ -17,7 +17,7 @@ benefits:
 
 run following command like any other npm packages
 
-```command
+```sh
 npm i jb-form
 ```
 import component script into your project
