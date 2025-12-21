@@ -20,6 +20,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     setValidationResult: () => { }
   }
+  #internals: ElementInternals;
   get validation() {
     return this.#validation;
   }
@@ -53,6 +54,11 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   constructor() {
     super();
+        if (typeof this.attachInternals == "function") {
+      //some browser don't support attachInternals
+      this.#internals = this.attachInternals();
+      this.#internals.role = "form";
+    }
     this.initWebComponent();
   }
   initWebComponent() {
