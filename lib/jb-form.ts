@@ -5,7 +5,7 @@ import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
 export * from './types.js';
 export * from './utils.js';
-export {VirtualElement};
+export { VirtualElement };
 export class JBFormWebComponent extends HTMLFormElement {
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
@@ -39,6 +39,15 @@ export class JBFormWebComponent extends HTMLFormElement {
   get value() {
     return this.getFormValues();
   }
+  get name() { return this.getAttribute('name') || ''; }
+  set name(value: string | null | undefined) {
+    if (value) {
+      this.setAttribute('name', value)
+    }
+    else {
+      this.removeAttribute('name')
+    }
+  }
   get virtualElements() {
     return {
       list: this.#virtualElements.list as ReadonlyArray<VirtualElement<any, any>>,
@@ -54,7 +63,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   constructor() {
     super();
-        if (typeof this.attachInternals == "function") {
+    if (typeof this.attachInternals == "function") {
       //some browser don't support attachInternals
       this.#internals = this.attachInternals();
       this.#internals.role = "form";
@@ -187,7 +196,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       isAllValid: true,
       elements: new Map(),
       virtualElements: new Map(),
-      subForms:new Map()
+      subForms: new Map()
     };
     //check for elements
     for (const elem of this.elements) {
@@ -371,7 +380,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     this.dispatchEvent(event);
   }
   #dispatchOnChange() {
-    const event = new Event("change",{bubbles:true,cancelable:false,composed:true});
+    const event = new Event("change", { bubbles: true, cancelable: false, composed: true });
     this.dispatchEvent(event);
   }
   #onAttributeChange(name: string, value: string) {
