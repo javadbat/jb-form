@@ -19,6 +19,7 @@ export type EventProps = {
    * when form dirty status change(user change value in form), dirty->clean | clean->dirty
    */
   onDirtyChange?: (e: JBFormEventType<CustomEvent>) => void,
+  onChange?: (e: JBFormEventType<Event>) => void,
   onSubmit?: (e: JBFormEventType<SubmitEvent>) => void,
 }
 export function useEvents(element:RefObject<JBFormWebComponent>,props:EventProps){
@@ -26,6 +27,7 @@ export function useEvents(element:RefObject<JBFormWebComponent>,props:EventProps
   useEvent(element, 'init', props.onInit, true);
   useEvent(element, "validity-change", props.onValidityChange);
   useEvent(element, "dirty-change", props.onDirtyChange);
+  useEvent(element, "change", props.onChange);
   useEvent(element, "submit", props.onSubmit);
   
 }

@@ -1,5 +1,5 @@
-import { JBCheckValidityParameter, CheckValidityAsyncResult, ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualElementConfig, VirtualExtractFunction } from './types';
-import { type WithValidation, ValidationHelper, ValidationItem } from 'jb-validation';
+import { type JBCheckValidityParameter, type CheckValidityAsyncResult, type ExtractFunction, type FormExtractFunction, type FormValidationMessages, type FormValidationResult, type FormValidationSummary, type FormValues, type JBFormInputStandards, type TraverseResult, type ValidationValue, VirtualElementConfig, type VirtualExtractFunction } from './types';
+import { type WithValidation, ValidationHelper, type ValidationItem } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
@@ -82,7 +82,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   static get observedAttributes(): string[] {
     return [];
   }
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+  attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
     // do something when an attribute has changed
     this.#onAttributeChange(name, newValue);
   }
@@ -384,7 +384,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     this.dispatchEvent(event);
   }
   #onAttributeChange(name: string, value: string) {
-    //TODO: add attrubutes to watch
+    //TODO: add attributes to watch
   }
 }
 const myElementNotExists = !customElements.get('jb-form');
