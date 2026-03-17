@@ -1,0 +1,96 @@
+import {Meta, Story, Controls, Source} from '@storybook/blocks';
+import * as FormStories from './JBForm.stories';
+
+<Meta title='Components/form elements/JBForm/ValueCollection' />
+
+# Value Collection
+
+The question is what happen if we put same `name` attribute for different form elements.    
+We Discuss it and the answer is we make a <b>Value Collection</b> type for it.     
+for now it just a  JS `Map` type with some extra rules.
+1. in `Value Collection` we have 2 key type `number` & `string`. number works like array index and string is equivalent of element `id` attribute.
+2. It must contain 1 extra member more than all field value called `ValueCollectionSymbol` to determine it's not a Field with `Map` type value but it's a <b>Value Collection</b>.
+
+## How it works?
+Most `jb-form` methods return their result by traversing all form elements, sub-forms and virtual elements. we create result base on each field `name` attribute.
+for example when you call `form.getFormValues()` you will get following result:
+
+```js
+{
+  bookName:'wiki',
+  price:1000
+}
+```
+but when we have form with multiple form field with the same name like this:
+
+```html
+<form is="jb-form">
+  <jb-input name="personName" />
+  <jb-input name="phoneNumber" />
+  <jb-input name="phoneNumber" />
+  <jb-input name="phoneNumber" />
+</form>
+```
+by calling `form.getFormValues()` we will get:
+
+```js
+{
+  personName:'john',
+  phoneNumber:new Map([[0,ValueCollectionSymbol],[1,'0912999999999'],[2,'0912888888888'],[3,'091277777777']])
+}
+```
+you can also pass this value to `form.setFormValues()` method to set all forms data.
+> all result include validations method also return `ValueCollectionSymbol` when they face multiple field with the same name.
+
+## What about sub-forms and Virtual elements?
+
+they are also support this model and export something like this for sub-forms:
+
+```html
+<form is="jb-form" name="mainForm">
+  <form is="jb-form" name="person">
+    <jb-input name="personName" />
+    <jb-input name="age" />
+  </form>
+  <form is="jb-form" name="person">
+    <jb-input name="personName" />
+    <jb-input name="age" />
+  </form>
+</form>
+```
+
+```js
+{
+  person:Map([
+    [0,ValueCollectionSymbol],
+    [1,{
+      personName:'john',
+      age:'12'
+    }],
+    [2,{
+      personName:'sara',
+      age:'18'
+    }]  
+  ])
+}
+```
+## id as a key
+
+if your element has a `id` we will use that id as a `Map` key so:
+`[1,'0912999999999']` will become `['YourId','0912999999999']`.
+this will help you cave value collection and can spot where or set it exactly where you want.
+
+## Why `Map` when we have arrays?
+
+first we develop this feature with Array because it easier to use and need no transformation for send it or store it as a JSON.
+but in later we find-out some of our form elements like `tagList` or multi select drop-down has a array value type. so we turn it to Map with a uniq symbol key to make sure all kind of form elements with array or even map type value can be supported.
+
+## examples:
+### complex form with the same names:
+<Story of={FormStories.FormWithSameName}/>
+<Controls of={FormStories.FormWithSameName}/>
+<Source of={FormStories.FormWithSameName}/>
+### small form with also virtual value
+<Story of={FormStories.ArrayValue}/>
+<Controls of={FormStories.ArrayValue}/>
+<Source of={FormStories.ArrayValue}/>

@@ -46,7 +46,7 @@ and for more feature just add `is="jb-form"`
 </form>
 ```
 
-## validation
+## Validation
 
 all jb design system form elements are supports form validation with [jb-validation](https://github.com/javadbat/jb-validation) way of providing them. you can check it by `checkValidity` or `reportValidity` function of form to see is input have a valid value or not.    
 if you use `jb-form` you can also show validation message of each error.
@@ -89,6 +89,7 @@ just check that your element must have `name` attribute in its HTML like: `<jb-i
 if you have a form element that dont support [jb-validation](https://github.com/javadbat/jb-validation) you can easily create a custom element that implements `WithValidation<ValidationValue>` interface. for more detail read [jb-validation](https://github.com/javadbat/jb-validation) doc.
 > [!IMPORTANT]
 > `jbCheckValidity` is the only method that supports Async validations so if you have async validations in your form use this method. it also use `Map<Element,Result>` in it's results so you could access the elements DOM easier with this method. this method has the most complicated but most rich results for advance usages.
+
 
 ## value control
 
@@ -153,10 +154,35 @@ const tagList:VirtualElement<string[],string[]> = {
 form.virtualElements.add(tagList);
 
 ```
+### Form Element With Same Name (Value Collection)
+
+if 2 or more form elements have the same name, we turn them into `Map` value. for example:
+
+```html
+<form is="jb-form">
+  <jb-input name="personName" value="Ali">
+  <jb-input name="phoneNumber" value="1234">
+  <jb-input name="phoneNumber" value="5678">
+</form>
+```
+```typescript
+const form = document.querySelector('form');
+console.log(form.getFormValues());
+/*
+  will log:
+  {
+    personName:"Ali",
+    phoneNumber:Map([[0,ValueCollectionSymbol][1,"1234"],[2,"5678"]])
+  }
+*/
+```
+To see Demo and document please see:
+[Link To Demo](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform-valuecollection--docs)
 
 ## Events
 
 jb-form add some new events to let you monitor your form in real time when something changes:
+
 ```javascript
   //called when submit button clicked or form.requestSubmit called
   form.addEventListener('submit',onSubmit);

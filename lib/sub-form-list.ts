@@ -1,25 +1,33 @@
-import { FormExtractFunction, FormValues, JBFormWebComponent, TraverseResult } from "./jb-form";
+import { type FormExtractFunction, type FormValues, handleCollectionSet, handleTraverseCollection, type JBFormWebComponent, type TraverseResult, ValueCollectionSymbol, type TraverseCollection } from "./jb-form";
 
 export class SubFormList {
-  #list:JBFormWebComponent[]= [];
-  #dictionary:Record<string,JBFormWebComponent> = {};
+  #list: JBFormWebComponent[] = [];
+  #dictionary: Record<string, JBFormWebComponent> = {};
   get list() {
     return [...this.#list] as const;
   }
-  get dictionary(){
-    return Object.freeze({...this.#dictionary});
+  get dictionary() {
+    return Object.freeze({ ...this.#dictionary });
   }
-  setValues<TFormValue extends FormValues = FormValues>(value: TFormValue){
-    for (const subForm of this.#list) {
+  setValues<TFormValue extends FormValues = FormValues>(value: TFormValue) {
+    const namedSubForms = this.#list.filter(x=> x.name && Object.getOwnPropertyNames(value).includes(x.name))
+    for (const subForm of namedSubForms) {
       if (subForm.name && value[subForm.name] !== undefined) {
-        subForm.setFormValues(value[subForm.name],false);
+        if (value[subForm.name] instanceof Map && (value[subForm.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
+          //when we face multiple values element name
+          //first we clone both values & form elements then remove found element and value from cloned collection.
+          const valueCollection = new Map((value[subForm.name])) as TraverseCollection<unknown>;
+          handleCollectionSet(valueCollection, namedSubForms, subForm)
+        }else{
+          subForm.setFormValues(value[subForm.name], false);
+        }
       }
     }
   }
-  setInitialValues<TFormValue extends FormValues = FormValues>(value: TFormValue){
+  setInitialValues<TFormValue extends FormValues = FormValues>(value: TFormValue) {
     for (const subForm of this.#list) {
       if (subForm.name && value[subForm.name] !== undefined) {
-        subForm.setFormInitialValues(value[subForm.name],false);
+        subForm.setFormInitialValues(value[subForm.name], false);
       }
     }
   }
@@ -29,17 +37,24 @@ export class SubFormList {
     //make it partial so every callback function have to check for nullable properties
     for (const formElement of this.#list) {
       if (formElement.name) {
-        result[formElement.name] = extractFunction(formElement);
+        //resulted extraction
+        const res = extractFunction(formElement);
+        if (result[formElement.name] !== undefined) {
+          // if we have the form with the same name in the result 
+          handleTraverseCollection(result, formElement, res);
+        } else {
+          result[formElement.name] = res;
+        }
       }
     }
     return result;
   }
-  add(form:JBFormWebComponent){
-    if(this.#list.includes(form)){
+  add(form: JBFormWebComponent) {
+    if (this.#list.includes(form)) {
       return;
     }
     this.#list.push(form);
-    if(form.name){
+    if (form.name) {
       this.#dictionary[form.name] = form;
     }
   }

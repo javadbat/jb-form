@@ -8,24 +8,26 @@ export interface JBFormInputStandards<TValue = string> {
   required: boolean,
   name: string,
   value: TValue,
+  id?:string,
   /**
   * @description check if user change the value of component based on value provided from outside and return true if user change a initial value
   */
   readonly isDirty: boolean
   initialValue: TValue
 }
+export type TraverseCollection<T> = Map<string|number,T> & Map<Symbol,true>
 //used inside form to turn all elements data to named object like FormValidationMessages, FormValueResult
 export type TraverseResult<T> = {
-  [key: string]: T
+  [key: string]: T | TraverseCollection<T>
 }
 export type FormValidationMessages = {
-  [key: string]: string
+  [key: string]: string | TraverseCollection<string>
 }
 export type FormValidationSummary = {
-  [key: string]: ValidationResultSummary | null;
+  [key: string]: ValidationResultSummary | TraverseCollection<ValidationResultSummary> | null;
 }
 export type FormValidationResult = {
-  [key: string]: ValidationResult<any> | null;
+  [key: string]: ValidationResult<any> | TraverseCollection<ValidationResult<any>> | null;
 }
 export type FormValues<TValue = any> = {
   //it may be object or any other type for different inputs

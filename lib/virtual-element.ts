@@ -1,8 +1,12 @@
-import { ValidationHelper } from "jb-validation";
-import { VirtualElementCallbacks, VirtualElementConfig } from "./types";
+import type { ValidationHelper } from "jb-validation";
+import type { VirtualElementCallbacks, VirtualElementConfig } from "./types";
 
 export class VirtualElement <TValue, TValidationValue> {
   name:string;
+  /**
+   * name maybe repeated but id must be unique
+   */
+  id?:string;
   validation?:ValidationHelper<TValidationValue>;
   dom?:HTMLElement;
   getValue?:()=>TValue;
@@ -11,6 +15,12 @@ export class VirtualElement <TValue, TValidationValue> {
   setInitialValue?:(value:TValue)=>void;
   #callbacks:{
     onChange:()=>void
+  }
+  get value(){
+    return this.getValue();
+  }
+  set Value(value:TValue){
+    this.setValue(value);
   }
   constructor(config:VirtualElementConfig<TValue, TValidationValue>){
     this.name = config.name;

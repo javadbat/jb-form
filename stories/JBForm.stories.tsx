@@ -1,13 +1,15 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback, } from "react";
 import { JBButton } from "jb-button/react";
 import 'jb-form';
-import { getInvalidElements } from 'jb-form';
-import { JBForm, Props } from 'jb-form/react';
-import { PersonForm, BankForm } from "./samples/TestForms";
+import { getInvalidElements, ValueCollectionSymbol } from 'jb-form';
+import { JBForm, JBFormValue, type Props } from 'jb-form/react';
+import { PersonForm, BankForm, ProductForm, BookForm } from "./samples/TestForms";
 import type { Meta, StoryObj } from '@storybook/react';
 
 // eslint-disable-next-line no-duplicate-imports
-import type { JBFormWebComponent } from "jb-form";
+import type { JBFormEventType, JBFormWebComponent, TraverseCollection } from "jb-form";
+import { JBInput } from "jb-input/react";
+import { JBNumberInput } from "jb-number-input/react";
 
 
 const meta: Meta<Props> = {
@@ -40,12 +42,13 @@ export const FormTest: Story = {
       const onSubmit = () => {
         alert("submit");
       };
-      const onDirtyChange = (e) => {
+      const onDirtyChange = (e: JBFormEventType<CustomEvent>) => {
         setIsDirty(e.detail.isDirty);
       };
-      const onValidityChange = (e) => {
+      const onValidityChange = (e: JBFormEventType<CustomEvent>) => {
         setIsValid(e.detail.isValid);
       };
+      // biome-ignore lint/correctness/useExhaustiveDependencies: <we need this>
       useEffect(() => {
         if (ref.current) {
           setIsValid(ref.current.checkValidity());
@@ -80,24 +83,26 @@ export const FormTreeTest: Story = {
       const ref = useRef<JBFormWebComponent>(null);
       const [isDirty, setIsDirty] = useState(false);
       const [isValid, setIsValid] = useState(true);
-      const onSubmit = () => {
+      const onSubmit = useCallback(() => {
         alert("submit");
-      };
-      const onDirtyChange = (e) => {
+      }, []);
+      const onDirtyChange = useCallback((e: JBFormEventType<CustomEvent>) => {
         setIsDirty(e.detail.isDirty);
-      };
-      const onValidityChange = (e) => {
+      }, []);
+      const onValidityChange = useCallback((e: JBFormEventType<CustomEvent>) => {
         setIsValid(e.detail.isValid);
-      };
+      }, []);
+      // biome-ignore lint/correctness/useExhaustiveDependencies: <we need this reaction>
       useEffect(() => {
         if (ref.current) {
           setIsValid(ref.current.checkValidity());
-          ref.current.addEventListener('submit', onSubmit);
-          ref.current.addEventListener('dirty-change', onDirtyChange);
-          ref.current.addEventListener('validity-change', onValidityChange);
+          ref.current.addEventListener('submit', onSubmit as EventListenerOrEventListenerObject);
+          ref.current.addEventListener('dirty-change', onDirtyChange as EventListenerOrEventListenerObject);
+          ref.current.addEventListener('validity-change', onValidityChange as EventListenerOrEventListenerObject);
         }
-      }, [ref]);
+      }, [ref.current, onValidityChange, onDirtyChange, onSubmit]);
       return (
+        //@ts-expect-error
         <form is="jb-form" ref={ref} {...args} style={{ display: 'flex', flexDirection: "column", gap: '1rem' }}>
           <form is="jb-form" name="personForm">
             <PersonForm></PersonForm>
@@ -126,11 +131,11 @@ export const SpotInvalidElementTest: Story = {
         const elements = getInvalidElements(res);
         elements.forEach(el => {
           el.animate([
-            { transform: "rotate(0deg)", display:'block' },
-            { transform: "rotate(2deg)", display:'block' },
-            { transform: "rotate(-2deg)", display:'block' },
-            { transform: "rotate(0deg)", display:'block' },
-          ],{duration:100,iterations:10,fill:'auto'})
+            { transform: "rotate(0deg)", display: 'block' },
+            { transform: "rotate(2deg)", display: 'block' },
+            { transform: "rotate(-2deg)", display: 'block' },
+            { transform: "rotate(0deg)", display: 'block' },
+          ], { duration: 100, iterations: 10, fill: 'auto' })
         })
       }
       return (
@@ -151,3 +156,130 @@ export const SpotInvalidElementTest: Story = {
     name: "parent-form",
   }
 };
+
+export const FormWithSameName: Story = {
+  render: () => {
+    const ref = useRef<JBFormWebComponent>(null);
+    const getValue = () => {
+      const values = ref.current?.getFormValues();
+      console.log(values);
+    }
+    const getValidations = () => {
+      ref.current?.checkValidity()
+      const validations = ref.current?.getValidationResult()
+      console.log(validations);
+    }
+    return (
+      <JBForm ref={ref} name="masterForm">
+        <p>see browser console for result</p>
+        <BankForm />
+        <p>we have 3 exact phone number form element</p>
+        <JBInput name="phoneNumber" label="phone number 1" />
+        <JBInput name="phoneNumber" label="phone number 2" />
+        <JBInput name="phoneNumber" label="phone number 3" />
+        <p>we have 3 exact form with same name of `ProductForm`</p>
+        <hr />
+        <JBForm name="ProductForm"><ProductForm /></JBForm>
+        <hr />
+        <JBForm name="ProductForm"><ProductForm /></JBForm>
+        <hr />
+        <JBForm name="ProductForm"><ProductForm /></JBForm>
+        <hr />
+        <JBForm name="ProductForm"><ProductForm /></JBForm>
+        <br />
+        <div style={{ display: 'flex', gap: '0.5rem', paddingBlock: '1rem' }}>
+          <JBButton onClick={getValue}>Get Values</JBButton>
+          <JBButton onClick={getValidations}>Get Validations</JBButton>
+        </div>
+      </JBForm>
+    )
+  }
+}
+
+export const FormValue: Story = {
+
+  // biome-ignore lint/suspicious/noExplicitAny: <here we have different args than component args>
+  render: (args: any) => {
+
+    const ref = useRef<JBFormWebComponent>(null);
+    const getValue = () => {
+      console.log(ref.current?.getFormValues());
+    }
+    const setValue = () => {
+      ref.current?.setFormValues(args.value)
+    }
+    const [bookId, setBookId] = useState(10);
+    return (
+      <JBForm name="myForm" ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <JBInput name="bookName" label="book name" />
+        <JBNumberInput name="price" label="price" />
+        <p>Hidden Value (bookId) is {bookId}</p>
+        <JBFormValue name="bookId" value={bookId} setValue={(value) => setBookId(value)} />
+        <JBButton onClick={getValue}>Get Value (See Console log)</JBButton>
+        <JBButton onClick={setValue}>Set Value (Set value in args)</JBButton>
+      </JBForm>
+    )
+  }, args: {
+    //@ts-ignore
+    value: {
+      bookId: 5,
+      bookName: "Wikipedia",
+      price: 100000
+    }
+  }
+}
+export const ArrayValue: Story = {
+
+  // biome-ignore lint/suspicious/noExplicitAny: <here we have different args than component args>
+  render: (args: any) => {
+
+    const ref = useRef<JBFormWebComponent>(null);
+    const getValue = () => {
+      console.log(ref.current?.getFormValues());
+    }
+    const setValue = () => {
+      ref.current?.setFormValues(args.value)
+    }
+    return (
+      <JBForm name="myForm" ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <p>first muli form element directly in form</p>
+        <JBInput name="phoneNumber" label="phone number 1" />
+        <JBInput name="phoneNumber" label="phone number 2" />
+        <JBInput name="phoneNumber" label="phone number 3" />
+        <hr />
+        <BookForm />
+        <hr />
+        <BookForm />
+        <hr />
+        <p>Form With Id "myBookForm"</p>
+        <BookForm id="myBookForm" />
+        <JBButton onClick={getValue}>Get Value (log it into console)</JBButton>
+        <JBButton onClick={setValue}>Set Value (Set value in args)</JBButton>
+      </JBForm>
+    )
+  }, args: {
+    //@ts-ignore
+    value: {
+      phoneNumber: new Map<any, any>([[ValueCollectionSymbol, true], [1, '09125588745'], [2, '0919074020'], [3, '09145898742']]) as TraverseCollection<string>,
+      books: new Map<any, any>([
+        [ValueCollectionSymbol, true],
+        [1, {
+          bookId: 1,
+          bookTitle: "Planets",
+          price: 100000
+        }],
+        [2, {
+          bookId: 2,
+          bookTitle: "Animals",
+          price: 20000
+        }],
+        ["myBookForm", {
+          bookId: 3,
+          bookTitle: "Set With Id",
+          price: 5000000
+        }
+        ]]
+      )
+    }
+  }
+}

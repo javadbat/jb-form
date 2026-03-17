@@ -1,4 +1,5 @@
-import { FormValues, TraverseResult, VirtualElementConfig, VirtualExtractFunction } from "./types";
+import type { TraverseCollection, FormValues, TraverseResult, VirtualElementConfig, VirtualExtractFunction } from "./types";
+import { handleCollectionSet, handleTraverseCollection, ValueCollectionSymbol } from "./utils";
 import { VirtualElement } from "./virtual-element";
 
 type VirtualElementListCallbacks = {
@@ -6,7 +7,7 @@ type VirtualElementListCallbacks = {
 }
 export class VirtualElementList {
   #list: VirtualElement<any, any>[] = [];
-  #dictionary: Record<string,VirtualElement<any,any>> = {}
+  #dictionary: Record<string, VirtualElement<any, any>> = {}
   #callbacks: VirtualElementListCallbacks;
   constructor(callbacks: VirtualElementListCallbacks) {
     this.#callbacks = callbacks;
@@ -14,13 +15,22 @@ export class VirtualElementList {
   get list() {
     return [...this.#list] as const;
   }
-  get dictionary(){
+  get dictionary() {
     return this.#dictionary;
   }
   setValues<TFormValue extends FormValues = FormValues>(value: TFormValue) {
-    for (const vElem of this.#list) {
-      if (vElem.name && value[vElem.name] !== undefined && typeof vElem.setValue == "function") {
-        vElem.setValue(value[vElem.name]);
+    const namedVElements = this.#list.filter(x => x.name && Object.getOwnPropertyNames(value).includes(x.name))
+    for (const vElem of namedVElements) {
+      if (value[vElem.name] !== undefined && typeof vElem.setValue == "function") {
+        if (value[vElem.name] instanceof Map && (value[vElem.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
+          //when we face multiple values element name
+          //first we clone both values & form elements then remove found element and value from cloned collection.
+          const valueCollection = new Map((value[vElem.name])) as TraverseCollection<unknown>;
+          handleCollectionSet(valueCollection, namedVElements, vElem)
+        } else {
+          vElem.setValue(value[vElem.name]);
+        }
+
       }
     }
   }
@@ -35,12 +45,22 @@ export class VirtualElementList {
  * @public add virtual element let you register some non standard form element into this form to activate all form helpers and methods for them
  * @param element the element you want to register
  */
-  add =<TValue, TValidationValue>(config: VirtualElementConfig<TValue, TValidationValue>)=>{
+  add = <TValue, TValidationValue>(config: VirtualElementConfig<TValue, TValidationValue>) => {
     const VElement = new VirtualElement(config);
     VElement.attachCallbacks({ onChange: () => this.#callbacks.handleStateChanges(VElement) });
     this.#list.push(VElement);
     this.#dictionary[VElement.name] = VElement;
     return VElement;
+  }
+  /**
+ * @public remove virtual element from form
+ * @param virtualElement the element you want to remove
+ */
+  remove = <TValue, TValidationValue>({ virtualElement }: { virtualElement: VirtualElement<TValue, TValidationValue> }) => {
+    const index = this.#list.findIndex(x => x == virtualElement);
+    if (index !== -1) {
+      this.#list.splice(index, 1);
+    }
   }
   /**
  * will traverse all virtual inputs and return object of requested data
@@ -52,9 +72,16 @@ export class VirtualElementList {
     //make it partial so every callback function have to check for nullable properties
     for (const formElement of this.#list) {
       if (formElement.name) {
-        result[formElement.name] = extractFunction(formElement);
+        const res = extractFunction(formElement)
+        if (result[formElement.name] !== undefined) {
+          //handle traverse result for elements with the same name (create a map for them)
+          handleTraverseCollection(result, formElement, res);
+        } else {
+          result[formElement.name] = res;
+        }
       }
     }
     return result;
   }
+
 }

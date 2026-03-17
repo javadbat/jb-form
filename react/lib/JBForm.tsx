@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useImperativeHandle, type PropsWithChildren } from 'react';
+import React, { useEffect, useImperativeHandle, useState, type PropsWithChildren } from 'react';
 import 'jb-form';
 // eslint-disable-next-line no-duplicate-imports
 import type { JBFormWebComponent } from 'jb-form';
@@ -8,34 +8,42 @@ import { JBFormProvider } from './context.js';
 import type { JBElementStandardProps } from 'jb-core/react';
 
 export * from './context.js';
-
+export {JBFormValue, Props as JBFormValueProps} from './JBFormValue.js'
 type JBFormProps =  PropsWithChildren<EventProps> & {
-  name?:string
+  name?:string,
+  ref?: React.ForwardedRef<JBFormWebComponent | undefined>,
 }
 export type Props = JBElementStandardProps<JBFormWebComponent, keyof JBFormProps> & JBFormProps;
 
 export * from './context.js';
 
-export const JBForm = React.forwardRef((props: Props, ref: React.ForwardedRef<JBFormWebComponent | undefined>) => {
+export function JBForm(props: Props) {
   const element = React.useRef<JBFormWebComponent>(null);
   
+  const { ref, onSubmit, onValidityChange, onDirtyChange, onInit, onLoad, onChange, children, ...formProps } = props;
+  /** we need re-render after ref assignment  */
+  const [_,setRefChange] = useState<number>(0);
+
   useImperativeHandle(
     ref,
     () => (element.current ?? undefined),
-    [element],
+    [element]
   );
+
+  useEffect(()=>{
+    setRefChange(s=>s+1);
+  },[element.current])
   
-  const { onSubmit, name, onValidityChange, onDirtyChange, onInit, onLoad, onChange, children, ...formProps } = props;
   useEvents(element,{onSubmit, onValidityChange, onDirtyChange,onInit,onLoad,onChange});
   return (
     <form is="jb-form" ref={element} {...formProps}>
-      <JBFormProvider value={element.current??null}>
+      <JBFormProvider value={element.current}>
         {
           children
         }
       </JBFormProvider>
     </form>
   );
-});
+};
 
 JBForm.displayName = "JBForm";

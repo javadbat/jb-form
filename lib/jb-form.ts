@@ -1,12 +1,14 @@
-import { type JBCheckValidityParameter, type CheckValidityAsyncResult, type ExtractFunction, type FormExtractFunction, type FormValidationMessages, type FormValidationResult, type FormValidationSummary, type FormValues, type JBFormInputStandards, type TraverseResult, type ValidationValue, VirtualElementConfig, type VirtualExtractFunction } from './types';
+import type { JBCheckValidityParameter, CheckValidityAsyncResult, ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualExtractFunction, TraverseCollection } from './types';
 import { type WithValidation, ValidationHelper, type ValidationItem } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
+import { handleCollectionSet, handleTraverseCollection, ValueCollectionSymbol } from './utils.js';
 export * from './types.js';
 export * from './utils.js';
 export { VirtualElement };
 export class JBFormWebComponent extends HTMLFormElement {
+  static get formAssociated() { return true; }
   //keep original form check validity
   #formCheckValidity = this.checkValidity;
   #formReportValidity = this.reportValidity;
@@ -39,6 +41,9 @@ export class JBFormWebComponent extends HTMLFormElement {
   get value() {
     return this.getFormValues();
   }
+  set value(value:FormValues){
+    this.setFormValues(value);
+  }
   get name() { return this.getAttribute('name') || ''; }
   set name(value: string | null | undefined) {
     if (value) {
@@ -50,9 +55,12 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   get virtualElements() {
     return {
+      // biome-ignore lint/suspicious/noExplicitAny: <any is acceptable here>
       list: this.#virtualElements.list as ReadonlyArray<VirtualElement<any, any>>,
+      // biome-ignore lint/suspicious/noExplicitAny: <any is acceptable here>
       dictionary: this.#virtualElements.dictionary as Readonly<Record<string, VirtualElement<any, any>>>,
-      add: this.#virtualElements.add
+      add: this.#virtualElements.add,
+      remove: this.#virtualElements.remove
     };
   }
   get subForms() {
@@ -63,11 +71,11 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   constructor() {
     super();
-    if (typeof this.attachInternals == "function") {
-      //some browser don't support attachInternals
-      this.#internals = this.attachInternals();
-      this.#internals.role = "form";
-    }
+    // if (typeof this.attachInternals == "function") {
+    //   //some browser don't support attachInternals
+    //   this.#internals = this.attachInternals();
+    //   this.#internals.role = "form";
+    // }
     this.initWebComponent();
   }
   initWebComponent() {
@@ -132,7 +140,7 @@ export class JBFormWebComponent extends HTMLFormElement {
             if (typeof item.validation?.checkValidity !== "function") {
               return false;
             }
-            return !item.validation.checkValidity({ showError: false });
+            return !item.validation.checkValiditySync({ showError: false });
           });
           if (invalidElement == undefined) {
             return true;
@@ -142,10 +150,11 @@ export class JBFormWebComponent extends HTMLFormElement {
         },
         message: "virtual element is invalid"
       },
+      // for forms first we check sync validations for sync functions
       {
         validator: () => {
           const invalidForm = this.#subForms.list.find((item) => {
-            return !item.checkValidity();
+            return !item.validation.checkValiditySync({ showError: false });
           });
           if (invalidForm == undefined) {
             return true;
@@ -154,7 +163,7 @@ export class JBFormWebComponent extends HTMLFormElement {
           }
         },
         message: "form element is invalid"
-      }
+      },
     ];
   }
   #checkValidity(): boolean {
@@ -249,9 +258,10 @@ export class JBFormWebComponent extends HTMLFormElement {
    * @returns @public
    */
   getValidationResult(): FormValidationResult {
-    return this.#traverseNamedElements((formElement) => formElement.validation?.result ?? null,
+    return this.#traverseNamedElements(
+      (formElement) => { return formElement.validation?.result ?? null },
       (vElement) => vElement.validation?.result ?? null,
-      (subForm) => subForm.validation.result,
+      (subForm) => { return subForm.validation.result },
     );
   }
   /**
@@ -279,10 +289,19 @@ export class JBFormWebComponent extends HTMLFormElement {
 * @param shouldUpdateInitialValue determine if we should also update initial value or not. pass false if you want initialValue remain untouched
 */
   setFormValues<TFormValue extends FormValues = FormValues>(value: TFormValue, shouldUpdateInitialValue = true) {
-    for (const elem of this.elements) {
-      const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
-      if (formElement.name && value[formElement.name] !== undefined) {
-        formElement.value = value[formElement.name];
+    const namedFormElements: Partial<WithValidation & JBFormInputStandards<unknown>>[] = (Array.from(this.elements) as unknown as Partial<WithValidation & JBFormInputStandards<unknown>>[]).filter(
+      x => x.name && Object.getOwnPropertyNames(value).includes(x.name)
+    );
+    for (const formElement of namedFormElements) {
+      if (value[formElement.name] !== undefined && !(formElement instanceof JBFormWebComponent)) {
+        if (value[formElement.name] instanceof Map && (value[formElement.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
+          //when we face multiple values element name
+          //first we clone both values & form elements then remove found element and value from cloned collection.
+          const valueCollection = new Map((value[formElement.name])) as TraverseCollection<unknown>;
+          handleCollectionSet(valueCollection,namedFormElements,formElement)
+        } else {
+          formElement.value = value[formElement.name];
+        }
       }
     }
     this.#virtualElements.setValues(value);
@@ -313,8 +332,13 @@ export class JBFormWebComponent extends HTMLFormElement {
     const result: TraverseResult<ValueType> = {};
     //make it partial so every callback function have to check for nullable properties
     for (const formElement of this.elements as unknown as Partial<WithValidation & JBFormInputStandards>[]) {
+      const res = extractFunction(formElement)
       if (formElement.name) {
-        result[formElement.name] = extractFunction(formElement);
+        if (result[formElement.name] !== undefined) {
+          handleTraverseCollection(result, formElement, res)
+        } else {
+          result[formElement.name] = res;
+        }
       }
     }
     return result;
@@ -330,6 +354,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   //keep dirty status from the last time check.
   #prevIsDirty = false;
   #prevValidity = this.checkValidity();
+  // biome-ignore lint/suspicious/noExplicitAny: <any is acceptable here>
   #handleStateChanges(element: Partial<JBFormInputStandards & WithValidation> | VirtualElement<any, any>) {
     const checkForDirty = () => {
       const currentIsDirty = this.isDirty;
@@ -383,7 +408,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     const event = new Event("change", { bubbles: true, cancelable: false, composed: true });
     this.dispatchEvent(event);
   }
-  #onAttributeChange(name: string, value: string) {
+  #onAttributeChange(_name: string, _value: string) {
     //TODO: add attributes to watch
   }
 }
