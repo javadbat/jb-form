@@ -1,6 +1,6 @@
 import type { ValidationResult, ValidationResultSummary, WithValidation, ValidationHelper } from "jb-validation";
-import { type JBFormWebComponent } from "./jb-form";
-import { type VirtualElement } from "./virtual-element";
+import type { JBFormWebComponent } from "./jb-form.js";
+import type { VirtualElement } from "./virtual-element.js";
 import type {EventTypeWithTarget} from 'jb-core';
 //indicate which property is essential for element to be jb-form compatible 
 export interface JBFormInputStandards<TValue = string> {
