@@ -1,5 +1,11 @@
 # changelog
 
+## []
+
+### fixes:
+- add `isConnected` check for elements to filter not rendered elements from result
+
+
 ## [0.8.0] - 2026-01-04
 ### new features
 - support same name for form elements, now it will give you `Map` of data when multi element have the same name

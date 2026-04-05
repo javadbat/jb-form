@@ -23,6 +23,9 @@ export class JBFormWebComponent extends HTMLFormElement {
     setValidationResult: () => { }
   }
   #internals: ElementInternals;
+  get validElements (){
+    return Array.from(this.elements).filter(el => el.isConnected)
+  }
   get validation() {
     return this.#validation;
   }
@@ -120,7 +123,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       {
         validator: () => {
           //TODO:it's not feasible now but try to bind for natural checkValidity when browser support it.
-          for (const elem of this.elements) {
+          for (const elem of this.validElements) {
             const element = elem as unknown as WithValidation;
             if (typeof element.checkValidity == "function") {
               //it will automatically update validation result on check
@@ -174,7 +177,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     //we dont use this.#validation because validation methods design to find first error and keep it but here we need to show every error on components 
     let isAllValid = true;
     //TODO:try to bind for natural checkValidity and do not use this methods
-    for (const elem of this.elements) {
+    for (const elem of this.validElements) {
       const element = elem as unknown as WithValidation;
       if (typeof element.reportValidity == "function") {
         isAllValid = element.reportValidity() && isAllValid;
@@ -208,7 +211,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       subForms: new Map()
     };
     //check for elements
-    for (const elem of this.elements) {
+    for (const elem of this.validElements) {
       const element = elem as unknown as WithValidation & HTMLElement;
       if (typeof element.validation?.checkValidity == "function") {
         const res = await element.validation.checkValidity({ showError: params.showError });
@@ -289,7 +292,7 @@ export class JBFormWebComponent extends HTMLFormElement {
 * @param shouldUpdateInitialValue determine if we should also update initial value or not. pass false if you want initialValue remain untouched
 */
   setFormValues<TFormValue extends FormValues = FormValues>(value: TFormValue, shouldUpdateInitialValue = true) {
-    const namedFormElements: Partial<WithValidation & JBFormInputStandards<unknown>>[] = (Array.from(this.elements) as unknown as Partial<WithValidation & JBFormInputStandards<unknown>>[]).filter(
+    const namedFormElements: Partial<WithValidation & JBFormInputStandards<unknown>>[] = (this.validElements as unknown as Partial<WithValidation & JBFormInputStandards<unknown>>[]).filter(
       x => x.name && Object.getOwnPropertyNames(value).includes(x.name)
     );
     for (const formElement of namedFormElements) {
@@ -314,7 +317,7 @@ export class JBFormWebComponent extends HTMLFormElement {
 * @description set initial value of named form input elements used for dirty field detection
 */
   setFormInitialValues<TFormValue extends FormValues = FormValues>(value: TFormValue, shouldUpdateValue = true) {
-    for (const elem of this.elements) {
+    for (const elem of this.validElements) {
       const formElement = elem as unknown as Partial<WithValidation & JBFormInputStandards>;
       if (formElement.name && value[formElement.name] !== undefined) {
         formElement.initialValue = value[formElement.name];
@@ -331,7 +334,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
     //make it partial so every callback function have to check for nullable properties
-    for (const formElement of this.elements as unknown as Partial<WithValidation & JBFormInputStandards>[]) {
+    for (const formElement of this.validElements as unknown as Partial<WithValidation & JBFormInputStandards>[]) {
       const res = extractFunction(formElement)
       if (formElement.name) {
         if (result[formElement.name] !== undefined) {
