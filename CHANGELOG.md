@@ -4,7 +4,7 @@
 
 ### fixes:
 - add `isConnected` check for elements to filter not rendered elements from result
-
+- change sub form finder method for more accurate result
 
 ## [0.8.0] - 2026-01-04
 ### new features

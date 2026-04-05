@@ -101,12 +101,17 @@ export const FormTreeTest: Story = {
           ref.current.addEventListener('validity-change', onValidityChange as EventListenerOrEventListenerObject);
         }
       }, [ref.current, onValidityChange, onDirtyChange, onSubmit]);
+      const [showPersonForm, setShowPersonForm] = useState(true);
       return (
         //@ts-expect-error
         <form is="jb-form" ref={ref} {...args} style={{ display: 'flex', flexDirection: "column", gap: '1rem' }}>
-          <form is="jb-form" name="personForm">
-            <PersonForm></PersonForm>
-          </form>
+          {
+            showPersonForm && 
+            <form is="jb-form" name="personForm">
+              <PersonForm></PersonForm>
+            </form>
+          }
+          <JBButton onClick={()=>setShowPersonForm(x=>!x)}>{showPersonForm?`Hide`:`Show`} Person Form</JBButton>
           <hr></hr>
           <form is="jb-form" name="bank-form">
             <BankForm />

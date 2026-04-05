@@ -23,7 +23,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     setValidationResult: () => { }
   }
   #internals: ElementInternals;
-  get validElements (){
+  get validElements() {
     return Array.from(this.elements).filter(el => el.isConnected)
   }
   get validation() {
@@ -44,7 +44,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   get value() {
     return this.getFormValues();
   }
-  set value(value:FormValues){
+  set value(value: FormValues) {
     this.setFormValues(value);
   }
   get name() { return this.getAttribute('name') || ''; }
@@ -301,7 +301,7 @@ export class JBFormWebComponent extends HTMLFormElement {
           //when we face multiple values element name
           //first we clone both values & form elements then remove found element and value from cloned collection.
           const valueCollection = new Map((value[formElement.name])) as TraverseCollection<unknown>;
-          handleCollectionSet(valueCollection,namedFormElements,formElement)
+          handleCollectionSet(valueCollection, namedFormElements, formElement)
         } else {
           formElement.value = value[formElement.name];
         }
@@ -397,14 +397,35 @@ export class JBFormWebComponent extends HTMLFormElement {
    * @description this function would find all internal jb-form elements and register them as it sub forms
    */
   #initJBFormTree() {
-    this.addEventListener('init', (e) => {
-      if (e.target instanceof JBFormWebComponent && e.target !== this) {
-        this.#subForms.add(e.target);
-      }
-    });
+    const observer = new MutationObserver((records, _observer) => {
+      records.forEach(record => {
+        if (record.target instanceof JBFormWebComponent) {
+          const addedForms: JBFormWebComponent[] = [];
+          record.addedNodes.forEach(n => {
+            if (n.nodeType == Node.ELEMENT_NODE) {
+              const added = n as HTMLElement
+              if (added.nodeName == "FORM" && n.isConnected && added instanceof JBFormWebComponent) {
+                addedForms.push(added);
+              } else {
+                added.querySelectorAll('form[is="jb-form"]').forEach(f => {
+                  if (f.parentElement.closest('form[is="jb-form"]') == this) {
+                    addedForms.push(f as JBFormWebComponent);
+                  }
+                })
+              }
+            }
+          })
+          addedForms.forEach(af => {
+            this.#subForms.add(af);
+          })
+          // console.log("removed",Array.from(record.removedNodes).filter(x=>x instanceof JBFormWebComponent) );
+        }
+      })
+    })
+    observer.observe(this, {subtree: true, childList: true });
   }
   #dispatchJBFormInit() {
-    const event = new CustomEvent("init", { bubbles: true, composed: true, cancelable: false });
+    const event = new CustomEvent("init", { bubbles: false, composed: false, cancelable: false });
     this.dispatchEvent(event);
   }
   #dispatchOnChange() {
@@ -413,6 +434,10 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   #onAttributeChange(_name: string, _value: string) {
     //TODO: add attributes to watch
+  }
+  disconnectedCallback() {
+    const event = new CustomEvent("disconnect", { bubbles: false, composed: false, cancelable: false });
+    this.dispatchEvent(event);
   }
 }
 const myElementNotExists = !customElements.get('jb-form');

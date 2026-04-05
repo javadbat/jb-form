@@ -2,7 +2,7 @@ import { type FormExtractFunction, type FormValues, handleCollectionSet, handleT
 
 export class SubFormList {
   #list: JBFormWebComponent[] = [];
-  #dictionary: Record<string, JBFormWebComponent> = {};
+  #dictionary: Record<string, JBFormWebComponent | JBFormWebComponent[]> = {};
   get list() {
     return [...this.#list] as const;
   }
@@ -10,7 +10,7 @@ export class SubFormList {
     return Object.freeze({ ...this.#dictionary });
   }
   setValues<TFormValue extends FormValues = FormValues>(value: TFormValue) {
-    const namedSubForms = this.#list.filter(x=> x.name && Object.getOwnPropertyNames(value).includes(x.name))
+    const namedSubForms = this.#list.filter(x => x.name && Object.getOwnPropertyNames(value).includes(x.name))
     for (const subForm of namedSubForms) {
       if (subForm.name && value[subForm.name] !== undefined) {
         if (value[subForm.name] instanceof Map && (value[subForm.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
@@ -18,7 +18,7 @@ export class SubFormList {
           //first we clone both values & form elements then remove found element and value from cloned collection.
           const valueCollection = new Map((value[subForm.name])) as TraverseCollection<unknown>;
           handleCollectionSet(valueCollection, namedSubForms, subForm)
-        }else{
+        } else {
           subForm.setFormValues(value[subForm.name], false);
         }
       }
@@ -49,13 +49,55 @@ export class SubFormList {
     }
     return result;
   }
+  #onSubFormAttributeChange = (mutations: MutationRecord[], observer: MutationObserver) => {
+    mutations.forEach((m) => {
+      if (m.type == "attributes" && m.attributeName == "name") {
+        if (m.oldValue) {
+          this.#removeFromDictionary(m.oldValue, m.target as JBFormWebComponent)
+        }
+        this.#addToDictionary((m.target as JBFormWebComponent).getAttribute("name"), m.target as JBFormWebComponent)
+      }
+    })
+  }
   add(form: JBFormWebComponent) {
     if (this.#list.includes(form)) {
       return;
     }
     this.#list.push(form);
     if (form.name) {
-      this.#dictionary[form.name] = form;
+      this.#addToDictionary(form.name, form);
+    }
+    // we observe sub form to know when name changed
+    const observer = new MutationObserver(this.#onSubFormAttributeChange)
+    observer.observe(form, { attributes: true, attributeFilter: ["name"], attributeOldValue: true, subtree: false, childList: false });
+    form.addEventListener('disconnect', () => {
+      this.remove(form);
+      observer.disconnect
+    }, { once: true, passive: true });
+  }
+  remove(form: JBFormWebComponent) {
+    const index = this.#list.findIndex(x => x == form);
+    if (index !== -1) {
+      this.#list.splice(index, 1);
+    }
+    this.#removeFromDictionary(form.name, form)
+
+  }
+  #addToDictionary(name: string, form: JBFormWebComponent) {
+    if (this.#dictionary[name]) {
+      this.#dictionary[name] = [this.#dictionary[name], form].flat(1);
+    } else {
+      this.#dictionary[name] = form;
+    }
+  }
+  #removeFromDictionary(name: string, form: JBFormWebComponent) {
+    if (Array.isArray(this.#dictionary[name])) {
+      const index = this.#dictionary[name].findIndex((x: JBFormWebComponent) => x == form);
+      if (index !== -1) {
+        this.#dictionary[name].splice(index, 1)
+      }
+    } else {
+      this.#dictionary[name] = undefined;
     }
   }
 }
