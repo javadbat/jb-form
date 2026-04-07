@@ -1,7 +1,6 @@
 # changelog
 
-## []
-
+## [0.8.1] - 2026-04-07
 ### fixes:
 - add `isConnected` check for elements to filter not rendered elements from result
 - change sub form finder method for more accurate result
