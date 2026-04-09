@@ -54,6 +54,7 @@ export function handleCollectionSet(valueCollection: TraverseCollection<unknown>
     if (x.id && valueCollection.has(x.id)) {
       // assign value that match id then delete from remaining list
       x.value = valueCollection.get(x.id)
+      dispatchFormChangeEvent(x)
       valueCollection.delete(x.id)
       elements.splice(i, 1);
     }
@@ -63,6 +64,17 @@ export function handleCollectionSet(valueCollection: TraverseCollection<unknown>
   // remain what left
   elements.forEach((x) => {
     x.value = remainValues.shift();
+    dispatchFormChangeEvent(x)
   }
   )
+}
+
+/**
+ * when we update form element value with a form value setter we also dispatch this event
+ */
+export function dispatchFormChangeEvent(formElement: unknown) {
+  if (formElement instanceof HTMLElement) {
+    const event = new Event("form-change", { bubbles: true, composed: true, cancelable: false });
+    formElement.dispatchEvent(event);
+  }
 }

@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, } from "react";
 import { JBButton } from "jb-button/react";
 import 'jb-form';
 import { getInvalidElements, ValueCollectionSymbol } from 'jb-form';
-import { JBForm, JBFormValue, type Props } from 'jb-form/react';
+import { JBForm, JBFormValue, useJBFormValue, type Props } from 'jb-form/react';
 import { PersonForm, BankForm, ProductForm, BookForm } from "./samples/TestForms";
 import type { Meta, StoryObj } from '@storybook/react';
 
@@ -214,6 +214,10 @@ export const FormValue: Story = {
       ref.current?.setFormValues(args.value)
     }
     const [bookId, setBookId] = useState(10);
+    const formValues = useJBFormValue({formRef:ref});
+    useEffect(()=>{
+      console.log("already set value",formValues);
+    },[formValues])
     return (
       <JBForm name="myForm" ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <JBInput name="bookName" label="book name" />
@@ -222,6 +226,46 @@ export const FormValue: Story = {
         <JBFormValue name="bookId" value={bookId} setValue={(value) => setBookId(value)} />
         <JBButton onClick={getValue}>Get Value (See Console log)</JBButton>
         <JBButton onClick={setValue}>Set Value (Set value in args)</JBButton>
+
+      </JBForm>
+    )
+  }, args: {
+    //@ts-ignore
+    value: {
+      bookId: 5,
+      bookName: "Wikipedia",
+      price: 100000
+    }
+  }
+}
+export const UseJBFormValue: Story = {
+
+  // biome-ignore lint/suspicious/noExplicitAny: <here we have different args than component args>
+  render: (args: any) => {
+
+    const ref = useRef<JBFormWebComponent>(null);
+    const getValue = () => {
+      console.log(ref.current?.getFormValues());
+    }
+    const setValue = () => {
+      ref.current?.setFormValues(args.value)
+    }
+    const [bookId, setBookId] = useState(10);
+    const formValues = useJBFormValue({formRef:ref});
+    const {value:bookName} = useJBFormValue<string>({formRef:ref, name:"bookName"});
+    useEffect(()=>{
+      console.log("already set value",formValues);
+    },[formValues])
+    return (
+      <JBForm name="myForm" ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <p>click on set value and see logs for full form values</p>
+        <JBInput name="bookName" label="book name" />
+        <JBNumberInput name="price" label="price" />
+        <p>Hidden Value (bookId) is {bookId}</p>
+        <JBFormValue name="bookId" value={bookId} setValue={(value) => setBookId(value)} />
+        <JBButton onClick={getValue}>Get Value (See Console log)</JBButton>
+        <JBButton onClick={setValue}>Set Value (Set value in args)</JBButton>
+        <p>the book name we set: <b>{bookName}</b></p>
       </JBForm>
     )
   }, args: {

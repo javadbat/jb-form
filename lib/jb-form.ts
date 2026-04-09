@@ -3,7 +3,7 @@ import { type WithValidation, ValidationHelper, type ValidationItem } from 'jb-v
 import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
-import { handleCollectionSet, handleTraverseCollection, ValueCollectionSymbol } from './utils.js';
+import { dispatchFormChangeEvent, handleCollectionSet, handleTraverseCollection, ValueCollectionSymbol } from './utils.js';
 export * from './types.js';
 export * from './utils.js';
 export { VirtualElement };
@@ -292,7 +292,7 @@ export class JBFormWebComponent extends HTMLFormElement {
 * @param shouldUpdateInitialValue determine if we should also update initial value or not. pass false if you want initialValue remain untouched
 */
   setFormValues<TFormValue extends FormValues = FormValues>(value: TFormValue, shouldUpdateInitialValue = true) {
-    const namedFormElements: Partial<WithValidation & JBFormInputStandards<unknown>>[] = (this.validElements as unknown as Partial<WithValidation & JBFormInputStandards<unknown>>[]).filter(
+    const namedFormElements: (Partial<WithValidation & JBFormInputStandards<unknown>>)[] = (this.validElements as unknown as Partial<WithValidation & JBFormInputStandards<unknown>>[]).filter(
       x => x.name && Object.getOwnPropertyNames(value).includes(x.name)
     );
     for (const formElement of namedFormElements) {
@@ -304,6 +304,7 @@ export class JBFormWebComponent extends HTMLFormElement {
           handleCollectionSet(valueCollection, namedFormElements, formElement)
         } else {
           formElement.value = value[formElement.name];
+          dispatchFormChangeEvent(formElement);
         }
       }
     }
@@ -313,6 +314,7 @@ export class JBFormWebComponent extends HTMLFormElement {
       this.setFormInitialValues(value, false);
     }
   }
+
   /**
 * @description set initial value of named form input elements used for dirty field detection
 */
