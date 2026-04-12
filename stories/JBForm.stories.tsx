@@ -222,8 +222,7 @@ export const FormValue: Story = {
       <JBForm name="myForm" ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <JBInput name="bookName" label="book name" />
         <JBNumberInput name="price" label="price" />
-        <p>Hidden Value (bookId) is {bookId}</p>
-        <JBFormValue name="bookId" value={bookId} setValue={(value) => setBookId(value)} />
+        <JBFormValue name="bookId" value={bookId} onChange={(value) => setBookId(value)}>{(v)=><p>Hidden Value (bookId) is {v}</p>}</JBFormValue>
         <JBButton onClick={getValue}>Get Value (See Console log)</JBButton>
         <JBButton onClick={setValue}>Set Value (Set value in args)</JBButton>
 
