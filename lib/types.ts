@@ -6,7 +6,7 @@ import type {EventTypeWithTarget} from 'jb-core';
 export interface JBFormInputStandards<TValue = string> {
   disabled: boolean,
   required: boolean,
-  name: string,
+  name: string | null,
   value: TValue,
   id?:string,
   /**
