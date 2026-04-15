@@ -6,7 +6,10 @@ import type {EventTypeWithTarget} from 'jb-core';
 export interface JBFormInputStandards<TValue = string> {
   disabled: boolean,
   required: boolean,
-  name: string | null,
+  /**
+   * name can't be null it must return empty string "" when it's not available (it's HTML standard)
+   */
+  name: string,
   value: TValue,
   id?:string,
   /**
@@ -21,14 +24,17 @@ export type TraverseResult<T> = {
   [key: string]: T | TraverseCollection<T>
 }
 export type FormValidationMessages = {
-  [key: string]: string | TraverseCollection<string>
+  [key: string]: string| null | TraverseCollection<string|null>
 }
 export type FormValidationSummary = {
-  [key: string]: ValidationResultSummary | TraverseCollection<ValidationResultSummary> | null;
+  [key: string]: ValidationResultSummary | TraverseCollection<ValidationResultSummary|null> | null;
 }
 export type FormValidationResult = {
-  [key: string]: ValidationResult<any> | TraverseCollection<ValidationResult<any>> | null;
+  // biome-ignore lint/suspicious/noExplicitAny: <it can get any validation value>
+  [key: string]: ValidationResult<any> | TraverseCollection<ValidationResult<any> | null> | null;
 }
+
+// biome-ignore lint/suspicious/noExplicitAny: <it's a collection it can accept any value>
 export type FormValues<TValue = any> = {
   //it may be object or any other type for different inputs
   [key: string]: TValue
@@ -92,7 +98,9 @@ export type CheckValidityAsyncResult = {
   /**
  * @property keep validation result of virtual elements (nested elements not included)
  */
-  virtualElements: Map<VirtualElement<any, any>, ValidationResult<any>>;
+  
+// biome-ignore lint/suspicious/noExplicitAny: <it's a collection it can accept any value as generic >
+virtualElements: Map<VirtualElement<any, any>, ValidationResult<any>>;
   /**
 * @property keep validation result of sub forms and sub forms (you can access nested elements from here) 
 */

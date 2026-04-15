@@ -1,5 +1,5 @@
 import type { JBCheckValidityParameter, CheckValidityAsyncResult, ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualExtractFunction, TraverseCollection } from './types';
-import { type WithValidation, ValidationHelper, type ValidationItem } from 'jb-validation';
+import { type WithValidation, ValidationHelper, type ValidationItem, type ShowValidationErrorParameters } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
@@ -16,13 +16,13 @@ export class JBFormWebComponent extends HTMLFormElement {
   #subForms = new SubFormList();
   callbacks = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    showValidationError: (message: string) => { },
+    showValidationError: (message: ShowValidationErrorParameters) => { },
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     cleanValidationError: () => { },
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     setValidationResult: () => { }
   }
-  #internals: ElementInternals;
+  #internals!: ElementInternals;
   get validElements() {
     return Array.from(this.elements).filter(el => el.isConnected)
   }
@@ -47,7 +47,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   set value(value: FormValues) {
     this.setFormValues(value);
   }
-  get name() { return this.getAttribute('name') || ''; }
+  get name(): string { return this.getAttribute('name') || ""; }
   set name(value: string | null | undefined) {
     if (value) {
       this.setAttribute('name', value)
@@ -129,7 +129,7 @@ export class JBFormWebComponent extends HTMLFormElement {
               //it will automatically update validation result on check
               const res = element.checkValidity();
               if (res == false) {
-                return element.validationMessage != "" ? element.validationMessage : false;
+                return element.validationMessage != "" ? element.validationMessage! : false;
               }
             }
           }
@@ -145,11 +145,12 @@ export class JBFormWebComponent extends HTMLFormElement {
             }
             return !item.validation.checkValiditySync({ showError: false });
           });
-          if (invalidElement == undefined) {
+          if (invalidElement == undefined || invalidElement.validation === undefined) {
             return true;
           } else {
             invalidElement.validation.resultSummary.message;
           }
+          return false
         },
         message: "virtual element is invalid"
       },
@@ -164,6 +165,7 @@ export class JBFormWebComponent extends HTMLFormElement {
           } else {
             invalidForm.validation.resultSummary.message;
           }
+          return false;
         },
         message: "form element is invalid"
       },
@@ -251,7 +253,8 @@ export class JBFormWebComponent extends HTMLFormElement {
    * @returns @public
    */
   getValidationSummary(): FormValidationSummary {
-    return this.#traverseNamedElements((formElement) => formElement.validation?.resultSummary ?? null,
+    return this.#traverseNamedElements(
+      (formElement) => formElement.validation?.resultSummary ?? null,
       (vElement) => vElement.validation?.resultSummary ?? null,
       (subForm) => subForm.validation.resultSummary,
     );
@@ -262,9 +265,9 @@ export class JBFormWebComponent extends HTMLFormElement {
    */
   getValidationResult(): FormValidationResult {
     return this.#traverseNamedElements(
-      (formElement) => { return formElement.validation?.result ?? null },
+      (formElement) =>  formElement.validation?.result ?? null ,
       (vElement) => vElement.validation?.result ?? null,
-      (subForm) => { return subForm.validation.result },
+      (subForm) =>  subForm.validation.result,
     );
   }
   /**
@@ -282,8 +285,8 @@ export class JBFormWebComponent extends HTMLFormElement {
 * @returns @public
 */
   getFormDirtyStatus(): TraverseResult<boolean> {
-    return this.#traverseNamedElements((formElement) => formElement.isDirty,
-      (vElement) => typeof vElement.getDirtyStatus == "function" ? vElement.getDirtyStatus() : null,
+    return this.#traverseNamedElements((formElement) => formElement.isDirty!,
+      (vElement) => typeof vElement.getDirtyStatus == "function" ? vElement.getDirtyStatus() : false,
       (subForm) => subForm.isDirty,
     );
   }
@@ -296,6 +299,9 @@ export class JBFormWebComponent extends HTMLFormElement {
       x => x.name && Object.getOwnPropertyNames(value).includes(x.name)
     );
     for (const formElement of namedFormElements) {
+      if (formElement.name === undefined) {
+        continue;
+      }
       if (value[formElement.name] !== undefined && !(formElement instanceof JBFormWebComponent)) {
         if (value[formElement.name] instanceof Map && (value[formElement.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
           //when we face multiple values element name
@@ -410,7 +416,7 @@ export class JBFormWebComponent extends HTMLFormElement {
                 addedForms.push(added);
               } else {
                 added.querySelectorAll('form[is="jb-form"]').forEach(f => {
-                  if (f.parentElement.closest('form[is="jb-form"]') == this) {
+                  if (f.parentElement?.closest('form[is="jb-form"]') == this) {
                     addedForms.push(f as JBFormWebComponent);
                   }
                 })
@@ -424,7 +430,7 @@ export class JBFormWebComponent extends HTMLFormElement {
         }
       })
     })
-    observer.observe(this, {subtree: true, childList: true });
+    observer.observe(this, { subtree: true, childList: true });
   }
   #dispatchJBFormInit() {
     const event = new CustomEvent("init", { bubbles: false, composed: false, cancelable: false });

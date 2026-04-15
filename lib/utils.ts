@@ -34,6 +34,9 @@ export const ValueCollectionSymbol = Symbol("ValueCollectionSymbol");
  * when there is multi element with the same name in traverse we use Map for that collection type
  */
 export function handleTraverseCollection<ValueType>(result: TraverseResult<ValueType>, formElement: { name?: string, id?: string }, res: ValueType) {
+  if(!formElement.name){
+    return
+  }
   if (!(result[formElement.name] instanceof Map && (result[formElement.name] as TraverseCollection<ValueType>).has(ValueCollectionSymbol))) {
     // when current value is not collection yet and it need to be a collection we transform it to collection first
     const key = formElement.id ? formElement.id : 1;
