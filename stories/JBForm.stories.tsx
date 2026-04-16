@@ -1,13 +1,13 @@
 import React, { useRef, useEffect, useState, useCallback, } from "react";
 import { JBButton } from "jb-button/react";
 import 'jb-form';
-import { getInvalidElements, ValueCollectionSymbol } from 'jb-form';
+import { getInvalidElements } from 'jb-form';
 import { JBForm, JBFormValue, useJBFormValue, type Props } from 'jb-form/react';
 import { PersonForm, BankForm, ProductForm, BookForm } from "./samples/TestForms";
 import type { Meta, StoryObj } from '@storybook/react';
 
 // eslint-disable-next-line no-duplicate-imports
-import type { JBFormEventType, JBFormWebComponent, TraverseCollection } from "jb-form";
+import { type JBFormEventType, type JBFormWebComponent, TraverseCollection } from "jb-form";
 import { JBInput } from "jb-input/react";
 import { JBNumberInput } from "jb-number-input/react";
 
@@ -261,7 +261,7 @@ export const UseJBFormValue: Story = {
         <JBInput name="bookName" label="book name" />
         <JBNumberInput name="price" label="price" />
         <p>Hidden Value (bookId) is {bookId}</p>
-        <JBFormValue name="bookId" value={bookId} setValue={(value) => setBookId(value)} />
+        <JBFormValue name="bookId" value={bookId} onChange={(value) => setBookId(value)} />
         <JBButton onClick={getValue}>Get Value (See Console log)</JBButton>
         <JBButton onClick={setValue}>Set Value (Set value in args)</JBButton>
         <p>the book name we set: <b>{bookName}</b></p>
@@ -308,9 +308,8 @@ export const ArrayValue: Story = {
   }, args: {
     //@ts-ignore
     value: {
-      phoneNumber: new Map<any, any>([[ValueCollectionSymbol, true], [1, '09125588745'], [2, '0919074020'], [3, '09145898742']]) as TraverseCollection<string>,
-      books: new Map<any, any>([
-        [ValueCollectionSymbol, true],
+      phoneNumber: new TraverseCollection<any>([[1, '09125588745'], [2, '0919074020'], [3, '09145898742']]) as TraverseCollection<string>,
+      books: new TraverseCollection<any>([
         [1, {
           bookId: 1,
           bookTitle: "Planets",

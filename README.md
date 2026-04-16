@@ -172,10 +172,11 @@ console.log(form.getFormValues());
   will log:
   {
     personName:"Ali",
-    phoneNumber:Map([[0,ValueCollectionSymbol][1,"1234"],[2,"5678"]])
+    phoneNumber:Map([[1,"1234"],[2,"5678"]])
   }
 */
 ```
+> this is not a any map it's TraverseCollection a map with extra properties and ability
 To see Demo and document please see:
 [Link To Demo](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform-valuecollection--docs)
 

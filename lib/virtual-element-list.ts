@@ -1,5 +1,6 @@
-import type { TraverseCollection, FormValues, TraverseResult, VirtualElementConfig, VirtualExtractFunction } from "./types";
-import { handleCollectionSet, handleTraverseCollection, ValueCollectionSymbol } from "./utils";
+import { TraverseCollection } from "./collections";
+import type {FormValues, TraverseResult, VirtualElementConfig, VirtualExtractFunction } from "./types";
+import { handleCollectionSet, handleTraverseCollection } from "./utils";
 import { VirtualElement } from "./virtual-element";
 
 type VirtualElementListCallbacks = {
@@ -22,7 +23,7 @@ export class VirtualElementList {
     const namedVElements = this.#list.filter(x => x.name && Object.getOwnPropertyNames(value).includes(x.name))
     for (const vElem of namedVElements) {
       if (value[vElem.name] !== undefined && typeof vElem.setValue == "function") {
-        if (value[vElem.name] instanceof Map && (value[vElem.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
+        if (value[vElem.name] instanceof TraverseCollection && value[vElem.name]) {
           //when we face multiple values element name
           //first we clone both values & form elements then remove found element and value from cloned collection.
           const valueCollection = new Map((value[vElem.name])) as TraverseCollection<unknown>;

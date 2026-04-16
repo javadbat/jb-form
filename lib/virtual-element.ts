@@ -15,12 +15,14 @@ export class VirtualElement <TValue, TValidationValue> {
   setInitialValue?:(value:TValue)=>void;
   #callbacks:{
     onChange:()=>void
+  }={
+    onChange:()=>{}
   }
   get value(){
-    return this.getValue();
+    return this.getValue?.();
   }
   set Value(value:TValue){
-    this.setValue(value);
+    this.setValue?.(value);
   }
   constructor(config:VirtualElementConfig<TValue, TValidationValue>){
     this.name = config.name;

@@ -36,7 +36,7 @@ by calling `form.getFormValues()` we will get:
 ```js
 {
   personName:'john',
-  phoneNumber:new Map([[0,ValueCollectionSymbol],[1,'0912999999999'],[2,'0912888888888'],[3,'091277777777']])
+  phoneNumber:new TraverseCollection([[1,'0912999999999'],[2,'0912888888888'],[3,'091277777777']])
 }
 ```
 you can also pass this value to `form.setFormValues()` method to set all forms data.
@@ -61,8 +61,7 @@ they are also support this model and export something like this for sub-forms:
 
 ```js
 {
-  person:Map([
-    [0,ValueCollectionSymbol],
+  person:TraverseCollection([
     [1,{
       personName:'john',
       age:'12'
