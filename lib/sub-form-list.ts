@@ -49,13 +49,13 @@ export class SubFormList {
     }
     return result;
   }
-  #onSubFormAttributeChange = (mutations: MutationRecord[], observer: MutationObserver) => {
+  #onSubFormAttributeChange = (mutations: MutationRecord[], _observer: MutationObserver) => {
     mutations.forEach((m) => {
       if (m.type == "attributes" && m.attributeName == "name") {
         if (m.oldValue) {
           this.#removeFromDictionary(m.oldValue, m.target as JBFormWebComponent)
         }
-        this.#addToDictionary((m.target as JBFormWebComponent).getAttribute("name"), m.target as JBFormWebComponent)
+        this.#addToDictionary((m.target as JBFormWebComponent).name, m.target as JBFormWebComponent)
       }
     })
   }
@@ -97,7 +97,7 @@ export class SubFormList {
         this.#dictionary[name].splice(index, 1)
       }
     } else {
-      this.#dictionary[name] = undefined;
+      delete this.#dictionary[name];
     }
   }
 }

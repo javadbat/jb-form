@@ -4,19 +4,19 @@ import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
 import { dispatchFormChangeEvent, handleCollectionSet, handleTraverseCollection, ValueCollectionSymbol } from './utils.js';
+import { FormElements } from './form-elements';
 export * from './types.js';
 export * from './utils.js';
 export { VirtualElement };
 export class JBFormWebComponent extends HTMLFormElement {
   static get formAssociated() { return true; }
   //keep original form check validity
-  #formCheckValidity = this.checkValidity;
-  #formReportValidity = this.reportValidity;
   #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges.bind(this) });
   #subForms = new SubFormList();
+  #formElements = new FormElements(this);
   callbacks = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    showValidationError: (message: ShowValidationErrorParameters) => { },
+    showValidationError: (_message: ShowValidationErrorParameters) => { },
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     cleanValidationError: () => { },
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -24,7 +24,7 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   #internals!: ElementInternals;
   get validElements() {
-    return Array.from(this.elements).filter(el => el.isConnected)
+    return Array.from(this.#formElements.allElements).filter(el => el.isConnected)
   }
   get validation() {
     return this.#validation;
@@ -36,7 +36,8 @@ export class JBFormWebComponent extends HTMLFormElement {
     getValidations: this.#getInsideValidations.bind(this),
     getValueString: (value) => JSON.stringify(value),
     setValidationResult: this.callbacks.setValidationResult
-  })
+  });
+  
   get isDirty(): boolean {
     const res = this.getFormDirtyStatus();
     return Object.values(res).includes(true);
@@ -88,6 +89,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     this.#initJBFormTree();
   }
   connectedCallback() {
+    this.#formElements.initElements();
     this.#dispatchJBFormInit();
   }
   static get observedAttributes(): string[] {
