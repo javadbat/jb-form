@@ -1,14 +1,17 @@
-import type { JBCheckValidityParameter, CheckValidityAsyncResult, ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualExtractFunction, TraverseCollection } from './types';
+import type { JBCheckValidityParameter, CheckValidityAsyncResult, ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualExtractFunction } from './types';
 import { type WithValidation, ValidationHelper, type ValidationItem, type ShowValidationErrorParameters } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
 import { VirtualElementList } from './virtual-element-list';
 import { SubFormList } from './sub-form-list';
-import { dispatchFormChangeEvent, handleCollectionSet, handleTraverseCollection, ValueCollectionSymbol } from './utils.js';
 import { FormElements } from './form-elements';
 export * from './types.js';
 export * from './utils.js';
-export { VirtualElement };
-export class JBFormWebComponent extends HTMLElement {
+import { dispatchFormChangeEvent, handleCollectionSet, handleTraverseCollection } from './utils.js';
+import { TraverseCollection } from './collections';
+export * from './types.js';
+export * from './utils.js';
+export { VirtualElement, TraverseCollection };
+export class JBFormWebComponent extends HTMLFormElement {
   static get formAssociated() { return true; }
   //keep original form check validity
   #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges.bind(this) });
@@ -303,10 +306,10 @@ export class JBFormWebComponent extends HTMLElement {
         continue;
       }
       if (value[formElement.name] !== undefined && !(formElement instanceof JBFormWebComponent)) {
-        if (value[formElement.name] instanceof Map && (value[formElement.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
+        if (value[formElement.name] instanceof TraverseCollection) {
           //when we face multiple values element name
           //first we clone both values & form elements then remove found element and value from cloned collection.
-          const valueCollection = new Map((value[formElement.name])) as TraverseCollection<unknown>;
+          const valueCollection = new TraverseCollection((value[formElement.name]));
           handleCollectionSet(valueCollection, namedFormElements, formElement)
         } else {
           formElement.value = value[formElement.name];

@@ -1,4 +1,5 @@
-import { type FormExtractFunction, type FormValues, handleCollectionSet, handleTraverseCollection, type JBFormWebComponent, type TraverseResult, ValueCollectionSymbol, type TraverseCollection } from "./jb-form";
+import { TraverseCollection } from "./collections";
+import { type FormExtractFunction, type FormValues, handleCollectionSet, handleTraverseCollection, type JBFormWebComponent, type TraverseResult } from "./jb-form";
 
 export class SubFormList {
   #list: JBFormWebComponent[] = [];
@@ -13,10 +14,10 @@ export class SubFormList {
     const namedSubForms = this.#list.filter(x => x.name && Object.getOwnPropertyNames(value).includes(x.name))
     for (const subForm of namedSubForms) {
       if (subForm.name && value[subForm.name] !== undefined) {
-        if (value[subForm.name] instanceof Map && (value[subForm.name] as TraverseCollection<unknown>).has(ValueCollectionSymbol)) {
+        if (value[subForm.name] instanceof TraverseCollection) {
           //when we face multiple values element name
           //first we clone both values & form elements then remove found element and value from cloned collection.
-          const valueCollection = new Map((value[subForm.name])) as TraverseCollection<unknown>;
+          const valueCollection = new TraverseCollection((value[subForm.name]));
           handleCollectionSet(valueCollection, namedSubForms, subForm)
         } else {
           subForm.setFormValues(value[subForm.name], false);

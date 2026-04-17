@@ -2,6 +2,7 @@ import type { ValidationResult, ValidationResultSummary, WithValidation, Validat
 import type { JBFormWebComponent } from "./jb-form.js";
 import type { VirtualElement } from "./virtual-element.js";
 import type { EventTypeWithTarget } from 'jb-core';
+import type { TraverseCollection } from "./collections.js";
 //indicate which property is essential for element to be jb-form compatible 
 export interface JBFormInputStandards<TValue = string> extends HTMLElement {
   disabled: boolean,
@@ -41,7 +42,6 @@ export interface JBFormInputStandards<TValue = string> extends HTMLElement {
 
 }
 export type NativeFormElements = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLFieldSetElement | HTMLOutputElement | HTMLObjectElement;
-export type TraverseCollection<T> = Map<string | number, T> & Map<Symbol, true>
 //used inside form to turn all elements data to named object like FormValidationMessages, FormValueResult
 export type TraverseResult<T> = {
   [key: string]: T | TraverseCollection<T>
