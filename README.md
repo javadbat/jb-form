@@ -28,8 +28,7 @@ import 'jb-form'
 
 ## usage
 
-jb-form is a little different form of web-component called `Customized built-in elements`  that mean it just extend the feature of `form` and change some of them so you have all `form` feature with a extra feature `jb-form` added.
-
+since poor support of safari in new version we don't extend native form. we just wrap it 
 ```html
 <form>
   <jb-input name="name" />
@@ -37,13 +36,13 @@ jb-form is a little different form of web-component called `Customized built-in 
 </form>
 ```
 
-and for more feature just add `is="jb-form"`
+and for more feature use `jb-form`
 
 ```html
-<form is="jb-form">
+<jb-form>
   <jb-input name="name" />
   <jb-button type="submit">
-</form>
+</jb-form>
 ```
 
 ## Validation
@@ -52,11 +51,11 @@ all jb design system form elements are supports form validation with [jb-validat
 if you use `jb-form` you can also show validation message of each error.
 
 ```html
-<form is="jb-form">
+<jb-form>
   <jb-input name="name" required/>
   <jb-number-input name="age" required/>
   <jb-button type="submit">
-</form>
+</jb-form>
 ```
 ```js
 // isFormValid1 will be true if use fill all fields and false if one of them is empty
@@ -156,14 +155,14 @@ form.virtualElements.add(tagList);
 ```
 ### Form Element With Same Name (Value Collection)
 
-if 2 or more form elements have the same name, we turn them into `Map` value. for example:
+if 2 or more form elements have the same name, we turn them into `Map` value(custom map named `TraverseCollection`). for example:
 
 ```html
-<form is="jb-form">
+<jb-form>
   <jb-input name="personName" value="Ali">
   <jb-input name="phoneNumber" value="1234">
   <jb-input name="phoneNumber" value="5678">
-</form>
+</jb-form>
 ```
 ```typescript
 const form = document.querySelector('form');
@@ -208,11 +207,11 @@ jb-form add some new events to let you monitor your form in real time when somet
 with jb-form you have ability to pace form tag inside another form and manage them individually or in overall.
 
 ```html
-<form is="jb-form">
-  <form is="jb-form" name="form1">
+<jb-form>
+  <jb-form name="form1">
     <jb-input name="input1" />
   </jb-form>
-  <form is="jb-form" name="form2">
+  <jb-form name="form2">
     <jb-input name="input2" />
   </jb-form>
 </jb-form>

@@ -22,7 +22,7 @@ export type EventProps = {
   onChange?: (e: JBFormEventType<Event>) => void,
   onSubmit?: (e: JBFormEventType<SubmitEvent>) => void,
 }
-export function useEvents(element:RefObject<JBFormWebComponent>,props:EventProps){
+export function useEvents(element:RefObject<JBFormWebComponent|null>,props:EventProps){
   useEvent(element, 'load', props.onLoad, true);
   useEvent(element, 'init', props.onInit, true);
   useEvent(element, "validity-change", props.onValidityChange);

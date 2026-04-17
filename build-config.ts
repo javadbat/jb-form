@@ -9,6 +9,7 @@ export const webComponentList: WebComponentBuildConfig[] = [
     external: ["jb-validation", "jb-core"],
     globals: {
       'jb-validation': "JBValidation",
+      "jb-core":"JBCore"
     },
   }
 ];

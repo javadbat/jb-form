@@ -24,12 +24,12 @@ for example when you call `form.getFormValues()` you will get following result:
 but when we have form with multiple form field with the same name like this:
 
 ```html
-<form is="jb-form">
+<jb-form>
   <jb-input name="personName" />
   <jb-input name="phoneNumber" />
   <jb-input name="phoneNumber" />
   <jb-input name="phoneNumber" />
-</form>
+</jb-form>
 ```
 by calling `form.getFormValues()` we will get:
 
@@ -47,16 +47,16 @@ you can also pass this value to `form.setFormValues()` method to set all forms d
 they are also support this model and export something like this for sub-forms:
 
 ```html
-<form is="jb-form" name="mainForm">
-  <form is="jb-form" name="person">
+<jb-form name="mainForm">
+  <jb-form name="person">
     <jb-input name="personName" />
     <jb-input name="age" />
-  </form>
-  <form is="jb-form" name="person">
+  </jb-form>
+  <jb-form name="person">
     <jb-input name="personName" />
     <jb-input name="age" />
-  </form>
-</form>
+  </jb-form>
+</jb-form>
 ```
 
 ```js

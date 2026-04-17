@@ -8,7 +8,7 @@ import { FormElements } from './form-elements';
 export * from './types.js';
 export * from './utils.js';
 export { VirtualElement };
-export class JBFormWebComponent extends HTMLFormElement {
+export class JBFormWebComponent extends HTMLElement {
   static get formAssociated() { return true; }
   //keep original form check validity
   #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges.bind(this) });
@@ -84,8 +84,6 @@ export class JBFormWebComponent extends HTMLFormElement {
   }
   initWebComponent() {
     this.#registerEventListener();
-    this.checkValidity = this.#checkValidity;
-    this.reportValidity = this.#reportValidity;
     this.#initJBFormTree();
   }
   connectedCallback() {
@@ -173,11 +171,11 @@ export class JBFormWebComponent extends HTMLFormElement {
       },
     ];
   }
-  #checkValidity(): boolean {
+  checkValidity(): boolean {
     //
     return this.#validation.checkValiditySync({ showError: false }).isAllValid;
   }
-  #reportValidity(): boolean {
+  reportValidity(): boolean {
     //we dont use this.#validation because validation methods design to find first error and keep it but here we need to show every error on components 
     let isAllValid = true;
     //TODO:try to bind for natural checkValidity and do not use this methods
@@ -417,8 +415,8 @@ export class JBFormWebComponent extends HTMLFormElement {
               if (added.nodeName == "FORM" && n.isConnected && added instanceof JBFormWebComponent) {
                 addedForms.push(added);
               } else {
-                added.querySelectorAll('form[is="jb-form"]').forEach(f => {
-                  if (f.parentElement?.closest('form[is="jb-form"]') == this) {
+                added.querySelectorAll('jb-form').forEach(f => {
+                  if (f.parentElement?.closest('jb-form') == this) {
                     addedForms.push(f as JBFormWebComponent);
                   }
                 })
@@ -452,6 +450,6 @@ export class JBFormWebComponent extends HTMLFormElement {
 }
 const myElementNotExists = !customElements.get('jb-form');
 if (myElementNotExists) {
-  window.customElements.define('jb-form', JBFormWebComponent, { extends: 'form' });
+  window.customElements.define('jb-form', JBFormWebComponent);
 }
 

@@ -1,12 +1,11 @@
 'use client';
 import React, { useEffect, useImperativeHandle, useState, type PropsWithChildren } from 'react';
 import 'jb-form';
-// eslint-disable-next-line no-duplicate-imports
 import type { JBFormWebComponent } from 'jb-form';
 import { useEvents,type EventProps } from './events-hook.js';
 import { JBFormProvider } from './context.js';
 import type { JBElementStandardProps } from 'jb-core/react';
-
+import "./module-declaration.js";
 export * from './context.js';
 export {JBFormValue, Props as JBFormValueProps} from './JBFormValue.js'
 type JBFormProps =  PropsWithChildren<EventProps> & {
@@ -36,13 +35,13 @@ export function JBForm(props: Props) {
   
   useEvents(element,{onSubmit, onValidityChange, onDirtyChange,onInit,onLoad,onChange});
   return (
-    <form is="jb-form" ref={element} {...formProps}>
+    <jb-form ref={element} {...formProps}>
       <JBFormProvider value={element.current}>
         {
           children
         }
       </JBFormProvider>
-    </form>
+    </jb-form>
   );
 };
 

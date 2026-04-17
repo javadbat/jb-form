@@ -61,9 +61,9 @@ export class FormElements {
     } else {
       if (this.#isCustomControl(node) && !this.customElements.has(node) && this.#isClosest(node)) {
         this.customElements.set(node, null);
+        node.setAttribute('form', this.form.id);
       } else {
         this.#handleUnregisteredWebComponent(node);
-        node.setAttribute('form', this.form.id);
       }
     }
 
@@ -93,6 +93,6 @@ export class FormElements {
       typeof (el as any).formAssociatedCallback === 'function';
   }
   #isClosest(el: HTMLElement) {
-    return el.parentElement?.closest('form[is="jb-form"]') == this.#jbForm;
+    return el.parentElement?.closest('jb-form') == this.#jbForm;
   }
 }

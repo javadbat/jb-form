@@ -104,21 +104,21 @@ export const FormTreeTest: Story = {
       const [showPersonForm, setShowPersonForm] = useState(true);
       return (
         //@ts-expect-error
-        <form is="jb-form" ref={ref} {...args} style={{ display: 'flex', flexDirection: "column", gap: '1rem' }}>
+        <jb-form ref={ref} {...args} style={{ display: 'flex', flexDirection: "column", gap: '1rem' }}>
           {
             showPersonForm && 
-            <form is="jb-form" name="personForm">
+            <jb-form name="personForm">
               <PersonForm></PersonForm>
-            </form>
+            </jb-form>
           }
           <JBButton onClick={()=>setShowPersonForm(x=>!x)}>{showPersonForm?`Hide`:`Show`} Person Form</JBButton>
           <hr></hr>
-          <form is="jb-form" name="bank-form">
+          <jb-form name="bank-form">
             <BankForm />
-          </form>
+          </jb-form>
           <div>isDirty:{isDirty ? 'dirty' : 'clean'}</div>
           <div>isValid:{isValid ? 'valid' : 'invalid'}</div>
-        </form>
+        </jb-form>
 
       );
     },
@@ -261,7 +261,7 @@ export const UseJBFormValue: Story = {
         <JBInput name="bookName" label="book name" />
         <JBNumberInput name="price" label="price" />
         <p>Hidden Value (bookId) is {bookId}</p>
-        <JBFormValue name="bookId" value={bookId} setValue={(value) => setBookId(value)} />
+        <JBFormValue name="bookId" value={bookId} onChange={(value) => setBookId(value)} />
         <JBButton onClick={getValue}>Get Value (See Console log)</JBButton>
         <JBButton onClick={setValue}>Set Value (Set value in args)</JBButton>
         <p>the book name we set: <b>{bookName}</b></p>
