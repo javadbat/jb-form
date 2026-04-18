@@ -1,5 +1,5 @@
 import { TraverseCollection } from "./collections";
-import type {FormValues, TraverseResult, VirtualElementConfig, VirtualExtractFunction } from "./types";
+import type { FormValues, TraverseResult, VirtualElementConfig, VirtualExtractFunction } from "./types";
 import { handleCollectionSet, handleTraverseCollection } from "./utils";
 import { VirtualElement } from "./virtual-element";
 
@@ -70,15 +70,18 @@ export class VirtualElementList {
   traverse<T>(extractFunction: VirtualExtractFunction<T>) {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
+    // in a rare scenario when we face multiple virtual element with same name and the first item has id. we need to keep that id to set it as a TraverseCollection key 
+    const idMap: Record<string, string> = {};
     //make it partial so every callback function have to check for nullable properties
     for (const formElement of this.#list) {
       if (formElement.name) {
         const res = extractFunction(formElement)
         if (result[formElement.name] !== undefined) {
           //handle traverse result for elements with the same name (create a map for them)
-          handleTraverseCollection(result, formElement, res);
+          handleTraverseCollection(result, formElement, res,idMap);
         } else {
           result[formElement.name] = res;
+          idMap[formElement.name] = formElement.id??''
         }
       }
     }

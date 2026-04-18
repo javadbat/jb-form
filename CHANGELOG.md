@@ -1,5 +1,12 @@
 # changelog
 
+## [0.11.0] - 2026-04-18
+### new features
+- add TraverseCollection type (extended map) for collection value with the same name
+- refactor all modules. we now don't extend html form. no we are standalone component
+- add support for safari
+- fix nesting form warnings
+
 ## [0.8.1] - 2026-04-07
 ### fixes:
 - add `isConnected` check for elements to filter not rendered elements from result

@@ -35,6 +35,8 @@ export class SubFormList {
   traverse<T>(extractFunction: FormExtractFunction<T>): TraverseResult<T> {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
+    // in a rare scenario when we face multiple sub-form with same name and the first item has id. we need to keep that id to set it as a TraverseCollection key 
+    const idMap: Record<string,string> = {};
     //make it partial so every callback function have to check for nullable properties
     for (const formElement of this.#list) {
       if (formElement.name) {
@@ -42,9 +44,10 @@ export class SubFormList {
         const res = extractFunction(formElement);
         if (result[formElement.name] !== undefined) {
           // if we have the form with the same name in the result 
-          handleTraverseCollection(result, formElement, res);
+          handleTraverseCollection(result, formElement, res, idMap);
         } else {
           result[formElement.name] = res;
+          idMap[formElement.name] = formElement.id;
         }
       }
     }

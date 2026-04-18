@@ -15,7 +15,7 @@
     "form web-component",
     "web-component"
   ],
-  "version": "0.10.0",
+  "version": "0.11.0",
   "bugs": "https://github.com/javadbat/jb-form/issues",
   "license": "MIT",
   "files": [
@@ -37,6 +37,6 @@
   "types": "./dist/jb-form.d.ts",
   "dependencies": {
     "jb-validation":"^0.4.0",
-    "jb-core":">=0.25.0"
+    "jb-core":">=0.26.0"
   }
 }

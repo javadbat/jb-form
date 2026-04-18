@@ -11,7 +11,7 @@ import { TraverseCollection } from './collections';
 export * from './types.js';
 export * from './utils.js';
 export { VirtualElement, TraverseCollection };
-export class JBFormWebComponent extends HTMLFormElement {
+export class JBFormWebComponent extends HTMLElement {
   static get formAssociated() { return true; }
   //keep original form check validity
   #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges.bind(this) });
@@ -40,7 +40,7 @@ export class JBFormWebComponent extends HTMLFormElement {
     getValueString: (value) => JSON.stringify(value),
     setValidationResult: this.callbacks.setValidationResult
   });
-  
+
   get isDirty(): boolean {
     const res = this.getFormDirtyStatus();
     return Object.values(res).includes(true);
@@ -75,6 +75,9 @@ export class JBFormWebComponent extends HTMLFormElement {
       list: this.#subForms.list,
       dictionary: this.#subForms.dictionary,
     };
+  }
+  get formElements(){
+    return this.#formElements;
   }
   constructor() {
     super();
@@ -268,9 +271,9 @@ export class JBFormWebComponent extends HTMLFormElement {
    */
   getValidationResult(): FormValidationResult {
     return this.#traverseNamedElements(
-      (formElement) =>  formElement.validation?.result ?? null ,
+      (formElement) => formElement.validation?.result ?? null,
       (vElement) => vElement.validation?.result ?? null,
-      (subForm) =>  subForm.validation.result,
+      (subForm) => subForm.validation.result,
     );
   }
   /**
@@ -344,14 +347,17 @@ export class JBFormWebComponent extends HTMLFormElement {
   #traverseFormNamedElements<T>(extractFunction: ExtractFunction<T>): TraverseResult<T> {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
+    // in a rare scenario when we face multiple form element with same name and the first item has id. we need to keep that id to set it as a TraverseCollection key 
+    const idMap: Record<string, string> = {};
     //make it partial so every callback function have to check for nullable properties
     for (const formElement of this.validElements as unknown as Partial<WithValidation & JBFormInputStandards>[]) {
       const res = extractFunction(formElement)
       if (formElement.name) {
         if (result[formElement.name] !== undefined) {
-          handleTraverseCollection(result, formElement, res)
+          handleTraverseCollection(result, formElement, res, idMap)
         } else {
           result[formElement.name] = res;
+          idMap[formElement.name] = formElement.id ?? ''
         }
       }
     }
@@ -429,7 +435,6 @@ export class JBFormWebComponent extends HTMLFormElement {
           addedForms.forEach(af => {
             this.#subForms.add(af);
           })
-          // console.log("removed",Array.from(record.removedNodes).filter(x=>x instanceof JBFormWebComponent) );
         }
       })
     })

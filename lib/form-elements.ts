@@ -31,11 +31,23 @@ export class FormElements {
   }
   #observer(mutations: MutationRecord[], observer: MutationObserver) {
     mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((addedNodes) => {
-        this.#register(addedNodes);
+      mutation.addedNodes.forEach((addedNode) => {
+        if (addedNode instanceof HTMLElement) {
+          //only elements
+          this.#register(addedNode);
+          //addedNodes only contain direct added nodes and not children of that we need to investigate children too
+          const children = addedNode.querySelectorAll("*");
+          children.forEach((ch) =>{ this.#register(ch)});
+        }
       })
-      mutation.removedNodes.forEach((addedNodes) => {
-        this.#unRegister(addedNodes);
+      mutation.removedNodes.forEach((removedNode) => {
+        if (removedNode instanceof HTMLElement) {
+          //only elements
+          this.#unRegister(removedNode);
+          //addedNodes only contain direct added nodes and not children of that we need to investigate children too
+          const children = removedNode.querySelectorAll("*");
+          children.forEach((ch) => {this.#unRegister(ch)});
+        }
       })
     })
   }

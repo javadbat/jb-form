@@ -30,13 +30,13 @@ export function getInvalidElements(result: CheckValidityAsyncResult): HTMLElemen
 /**
  * when there is multi element with the same name in traverse we use Map for that collection type
  */
-export function handleTraverseCollection<ValueType>(result: TraverseResult<ValueType>, formElement: { name?: string, id?: string }, res: ValueType) {
+export function handleTraverseCollection<ValueType>(result: TraverseResult<ValueType>, formElement: { name?: string, id?: string }, res: ValueType, idMap: Record<string,string>) {
   if(!formElement.name){
     return
   }
   if (!(result[formElement.name] instanceof TraverseCollection)) {
     // when current value is not collection yet and it need to be a collection we transform it to collection first
-    const key = formElement.id ? formElement.id : 0;
+    const key = idMap[formElement.name]??0;
     result[formElement.name] = new TraverseCollection<ValueType>().set(key, result[formElement.name] as ValueType)
   }
   // then we add our new item
