@@ -7,7 +7,7 @@ import { JBFormProvider } from './context.js';
 import type { JBElementStandardProps } from 'jb-core/react';
 import "./module-declaration.js";
 export * from './context.js';
-export {JBFormValue, Props as JBFormValueProps} from './JBFormValue.js'
+export {JBFormValue, type Props as JBFormValueProps} from './JBFormValue.js'
 type JBFormProps =  PropsWithChildren<EventProps> & {
   name?:string,
   ref?: React.ForwardedRef<JBFormWebComponent | undefined>,
