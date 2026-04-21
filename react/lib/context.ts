@@ -22,7 +22,7 @@ export const useJBFormValue = <TValue=unknown>(args: useJBFormValueArgs):UseJBFo
   // const defaultForm = useJBForm()
   const events = args.events ?? ["change", "form-change"];
   useEffect(() => {
-    const form = args.formRef.current;
+    const form = args.formRef?.current;
     const signal = new AbortController();
     if (form) {
       events.forEach(e => {
