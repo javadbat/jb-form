@@ -7,7 +7,7 @@
 
 jb form react component to make jb-form easier to use
 
-## usage
+## Usage
 ```jsx
 import {JBForm} from 'jb-form/react'
 
@@ -42,7 +42,7 @@ const form = useJBForm();
 ## Get form value in react with Hooks
 
 syncing form value with react states are a challenging job. some times we have complex forms that rendering one part is depend on other parts.
-here we develop a hook that listen to changes event of form value and update states base on latest value
+here we develop a hook that listen to changes event of form value and update states based on latest value
 
 ```ts
   // get all forms value
@@ -50,3 +50,7 @@ here we develop a hook that listen to changes event of form value and update sta
   // by passing name name you get specific form elements value 
   const {value:bookName} = useJBFormValue<string>({formRef:ref, name:"bookName"});
 ```
+
+## Shared Documentation
+
+For web-component behavior, events, slots, and CSS variables, see [`jb-form`](https://github.com/javadbat/jb-form).

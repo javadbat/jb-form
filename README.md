@@ -14,12 +14,10 @@ benefits:
 - you can set value of all form inputs and elements with just one command.
 - standard events for dirty change or validation change to notify you in real time.
 
-## Using with JS frameworks
-
+## Using With JS Frameworks
 - [<img src="https://img.shields.io/badge/React.js-jb--form%2Freact-000.svg?logo=react&logoColor=%2361DAFB" height="30" />](https://github.com/javadbat/jb-form/tree/main/react)
 
-## setup & install
-
+## Installation
 run following command like any other npm packages
 
 ```sh
@@ -31,8 +29,7 @@ import component script into your project
 import 'jb-form'
 ```
 
-## usage
-
+## Usage
 since poor support of safari in new version we don't extend native form. we just wrap it 
 ```html
 <form>
@@ -90,7 +87,7 @@ const elements = getInvalidElements(res);
 ```
 all jb design system support [jb-validation](https://github.com/javadbat/jb-validation) so don't worry about them. if you want to use `getValidationSummary` or `getValidationResult`.    
 just check that your element must have `name` attribute in its HTML like: `<jb-input name="something"/>`.
-if you have a form element that dont support [jb-validation](https://github.com/javadbat/jb-validation) you can easily create a custom element that implements `WithValidation<ValidationValue>` interface. for more detail read [jb-validation](https://github.com/javadbat/jb-validation) doc.
+if you have a form element that don't support [jb-validation](https://github.com/javadbat/jb-validation) you can easily create a custom element that implements `WithValidation<ValidationValue>` interface. for more detail read [jb-validation](https://github.com/javadbat/jb-validation) doc.
 > [!IMPORTANT]
 > `jbCheckValidity` is the only method that supports Async validations so if you have async validations in your form use this method. it also use `Map<Element,Result>` in it's results so you could access the elements DOM easier with this method. this method has the most complicated but most rich results for advance usages.
 
@@ -128,7 +125,7 @@ for doing so you just need to call `addVirtualElement` function:
 
 ```typescript
 // here is type of VirtualElement you need to build
-//TValue is the component normal value you always want to get and TValidationValue is the value you want to pass to validation module validators. they may be the same type or not base on your component 
+//TValue is the component normal value you always want to get and TValidationValue is the value you want to pass to validation module validators. they may be the same type or not based on your component 
 type VirtualElementConfig<TValue,TValidationValue> = {
   //name of the field in all result returns. it's required.
   name:string,
@@ -185,7 +182,6 @@ To see Demo and document please see:
 [Link To Demo](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform-valuecollection--docs)
 
 ## Events
-
 jb-form add some new events to let you monitor your form in real time when something changes:
 
 ```javascript
@@ -224,8 +220,7 @@ with jb-form you have ability to pace form tag inside another form and manage th
 ```
 this really help you to manage pages that contain wizard forms or let separate forms in different components so your reusable component can have it's own form and still can be managed by parent page form.
 
-## Other Related Docs:
-
+## Related Docs
 - see [All JB Design system Component List](https://javadbat.github.io/design-system/) for more components.
 
 - use [Contribution Guide](https://github.com/javadbat/design-system/blob/main/docs/contribution-guide.md) if you want to contribute in this component.
