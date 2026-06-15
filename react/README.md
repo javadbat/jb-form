@@ -1,5 +1,10 @@
 # JBForm React
 
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/jb-form)
+[![GitHub license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://raw.githubusercontent.com/javadbat/jb-form/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/jb-form-react)](https://www.npmjs.com/package/jb-form-react)
+![GitHub Created At](https://img.shields.io/github/created-at/javadbat/jb-form)
+
 jb form react component to make jb-form easier to use
 
 ## usage
