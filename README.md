@@ -14,6 +14,10 @@ benefits:
 - you can set value of all form inputs and elements with just one command.
 - standard events for dirty change or validation change to notify you in real time.
 
+## Using with JS frameworks
+
+- [<img src="https://img.shields.io/badge/React.js-jb--form%2Freact-000.svg?logo=react&logoColor=%2361DAFB" height="30" />](https://github.com/javadbat/jb-form/tree/main/react)
+
 ## setup & install
 
 run following command like any other npm packages
