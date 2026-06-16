@@ -81,11 +81,11 @@ export class JBFormWebComponent extends HTMLElement {
   }
   constructor() {
     super();
-    // if (typeof this.attachInternals == "function") {
-    //   //some browser don't support attachInternals
-    //   this.#internals = this.attachInternals();
-    //   this.#internals.role = "form";
-    // }
+    if (typeof this.attachInternals == "function") {
+      //some browser don't support attachInternals
+      this.#internals = this.attachInternals();
+      this.#internals.role = "form";
+    }
     this.initWebComponent();
   }
   initWebComponent() {

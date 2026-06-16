@@ -5,222 +5,261 @@
 [![NPM Version](https://img.shields.io/npm/v/jb-form)](https://www.npmjs.com/package/jb-form)
 ![GitHub Created At](https://img.shields.io/github/created-at/javadbat/jb-form)
 
-jb design system special form with special feature like dirty check and validation
+JB Design System form coordinator for validation, dirty checks, value collection, virtual fields, and nested forms.
 
-benefits:
+- Validates JB form controls with one command.
+- Tracks aggregate dirty state.
+- Gets and sets values for named child controls.
+- Supports native form controls, form-associated custom elements, virtual elements, and nested `jb-form` elements.
+- Dispatches submit, dirty-change, and validity-change events.
 
-- you can check validation of all form inputs and elements with just one command.
-- you can check dirty status of all form inputs and elements with just one command.
-- you can set value of all form inputs and elements with just one command.
-- standard events for dirty change or validation change to notify you in real time.
+## When to use
+
+Use `jb-form` when a group of fields needs aggregate validation, value collection, dirty-state tracking, virtual fields, or nested form sections.
+
+Use a native `<form>` when you only need browser-native submission and do not need JB aggregate helpers.
+
+## Demo
+
+- [Storybook](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform)
+- [Value collection demo](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform-valuecollection--docs)
 
 ## Using With JS Frameworks
+
 - [<img src="https://img.shields.io/badge/React.js-jb--form%2Freact-000.svg?logo=react&logoColor=%2361DAFB" height="30" />](https://github.com/javadbat/jb-form/tree/main/react)
 
 ## Installation
-run following command like any other npm packages
 
 ```sh
 npm i jb-form
 ```
-import component script into your project
 
 ```js
-import 'jb-form'
+import 'jb-form';
 ```
-
-## Usage
-since poor support of safari in new version we don't extend native form. we just wrap it 
-```html
-<form>
-  <jb-input name="name" />
-  <jb-button type="submit">
-</form>
-```
-
-and for more feature use `jb-form`
 
 ```html
 <jb-form>
-  <jb-input name="name" />
-  <jb-button type="submit">
+  <jb-input name="name" required></jb-input>
+  <jb-button type="submit">Submit</jb-button>
 </jb-form>
 ```
+
+## API reference
+
+### Attributes
+
+| name | type | default | description |
+| --- | --- | --- | --- |
+| `name` | `string` | `""` | Name used when this form is nested inside another `jb-form`. |
+
+### Properties
+
+| name | type | readonly | description |
+| --- | --- | --- | --- |
+| `value` | `FormValues` | no | Aggregated object of named child values. Setting it calls `setFormValues(value)`. |
+| `name` | `string` | no | Name attribute value used by parent `jb-form` traversal. |
+| `isDirty` | `boolean` | yes | `true` when any named child control, virtual element, or sub-form is dirty. |
+| `validation` | `ValidationHelper<FormValues>` | yes | Aggregate `jb-validation` helper. |
+| `validElements` | `HTMLElement[]` | yes | Connected native and custom form controls registered directly under this `jb-form`. |
+| `virtualElements` | object | yes | Virtual element registry: `list`, `dictionary`, `add(config)`, and `remove({ virtualElement })`. |
+| `subForms` | object | yes | Nested `jb-form` registry: `list` and `dictionary`. |
+| `formElements` | `FormElements` | yes | Internal native/custom child form element registry. |
+
+### Methods
+
+| name | returns | description |
+| --- | --- | --- |
+| `checkValidity()` | `boolean` | Runs synchronous aggregate validation without showing errors. |
+| `reportValidity()` | `boolean` | Runs synchronous aggregate validation and asks children to show errors. |
+| `jbCheckValidity({ showError })` | `Promise<CheckValidityAsyncResult>` | Runs rich async validation for `jb-validation` compatible children, virtual elements, and sub-forms. |
+| `getValidationMessages()` | `FormValidationMessages` | Returns validation messages for named child controls, virtual elements, and sub-forms. |
+| `getValidationSummary()` | `FormValidationSummary` | Returns validation summaries for named `jb-validation` compatible items. |
+| `getValidationResult()` | `FormValidationResult` | Returns full validation results for named `jb-validation` compatible items. |
+| `getFormValues()` | `FormValues` | Returns all named child values. Repeated names become `TraverseCollection`. |
+| `getFormDirtyStatus()` | `TraverseResult<boolean>` | Returns dirty status for named child controls, virtual elements, and sub-forms. |
+| `setFormValues(value, shouldUpdateInitialValue?)` | `void` | Sets values by `name`. Also updates initial values unless the second argument is `false`. |
+| `setFormInitialValues(value, shouldUpdateValue?)` | `void` | Sets initial values used for dirty checks. Also updates current values unless the second argument is `false`. |
+
+### Events
+
+| event | detail | description |
+| --- | --- | --- |
+| `submit` | none | Dispatched after a trusted child submit is intercepted and `reportValidity()` returns `true`. |
+| `dirty-change` | `{ isDirty: boolean }` | Dispatched when aggregate dirty state changes. |
+| `validity-change` | `{ isValid: boolean }` | Dispatched when aggregate synchronous validity changes. |
+| `change` | none | Dispatched by the form when a virtual element changes. Child controls may also bubble their own `change` events through `jb-form`. |
+| `form-change` | none | Dispatched from a child control when `setFormValues()` changes it programmatically. |
+| `init` | none | Dispatched from `connectedCallback` after child element scanning starts. |
+| `disconnect` | none | Dispatched from `disconnectedCallback`. |
 
 ## Validation
 
-all jb design system form elements are supports form validation with [jb-validation](https://github.com/javadbat/jb-validation) way of providing them. you can check it by `checkValidity` or `reportValidity` function of form to see is input have a valid value or not.    
-if you use `jb-form` you can also show validation message of each error.
+Use `checkValidity()` for a silent synchronous check and `reportValidity()` to show child validation messages.
 
-```html
-<jb-form>
-  <jb-input name="name" required/>
-  <jb-number-input name="age" required/>
-  <jb-button type="submit">
-</jb-form>
-```
 ```js
-// isFormValid1 will be true if use fill all fields and false if one of them is empty
-const isFormValid1 = document.querySelector('form').checkValidity();
-// isFormValid2 will be true if use fill all fields and false if one of them is empty
-// and it shows message below the inputs if they were empty
-const isFormValid2 = document.querySelector('form').reportValidity();
+const form = document.querySelector('jb-form');
+
+const isValid = form.checkValidity();
+const isValidAndShown = form.reportValidity();
 ```
-## get more detailed validation report
 
-one of the `jb-form` extended feature is a more detailed validation report than standard form element.
-here is the functions:
+Use `jbCheckValidity()` when async validations are involved. It validates JB validation-compatible child controls, virtual elements, and sub-forms and returns a tree result with element references.
 
-```javascript
-const form = document.querySelector('form');
-// will return key value object of *named* element with error message ('' if element value is valid) works for all form standards element like HTML input
+```js
+import { getInvalidElements } from 'jb-form';
+
+const result = await form.jbCheckValidity({ showError: true });
+const invalidElements = getInvalidElements(result);
+```
+
+Detailed validation helpers:
+
+```js
 form.getValidationMessages();
-// will return key value object of *named* element with error summary (null if element not implement jb-validation standard) works only for custom element that implement jb-validation standard
 form.getValidationSummary();
-// will return key value object of *named* element with error full report (null if element not implement jb-validation standard) works only for custom element that implement jb-validation standards
 form.getValidationResult();
-// this method will validate all your jb-validation compatible (web-components,virtual elements, jb-forms) with all their async validations. it has the most rich result and have tree data structure for tree forms and even validate elements without name.
-// take care that this method don't validate non jb-validations element like form input or select and will only support jb-validations standard methods
-const res = await form.jbCheckValidity({showError:true});
-//this method will extract HTML Dom of invalid form elements (for virtual element you must provide dom when define it)
-const elements = getInvalidElements(res);
 ```
-all jb design system support [jb-validation](https://github.com/javadbat/jb-validation) so don't worry about them. if you want to use `getValidationSummary` or `getValidationResult`.    
-just check that your element must have `name` attribute in its HTML like: `<jb-input name="something"/>`.
-if you have a form element that don't support [jb-validation](https://github.com/javadbat/jb-validation) you can easily create a custom element that implements `WithValidation<ValidationValue>` interface. for more detail read [jb-validation](https://github.com/javadbat/jb-validation) doc.
-> [!IMPORTANT]
-> `jbCheckValidity` is the only method that supports Async validations so if you have async validations in your form use this method. it also use `Map<Element,Result>` in it's results so you could access the elements DOM easier with this method. this method has the most complicated but most rich results for advance usages.
 
+## Value control
 
-## value control
+`jb-form` collects values from named direct child controls, virtual elements, and named sub-forms.
 
-jb-design system components support some methods to manage values and state of themselves. things such as `isDirty` , `initialValue` are some of them.    
-jb-form provide you some methods that let you manage them easier. here are the methods:
 ```js
-//return all named element values in a single object
-form.getFormValues()
-// return a object of named elements with their dirty status(read doc below the code for more information)
-form.getFormDirtyStatus();
-const formValue = {
-  name:"joe",
-  age:10
-}
-// set value of form elements.(elements match by their name)
-form.setFormValues(formValue);
-//if second argument is true or not provided setFormValues will also update initial value and if set to false it just update value
-form.setFormValues(formValue,false);
-// set initial value of form elements.(initial value is used to compare with value and set isDirty flag)
-form.setFormInitialValues(formValue)
-//if second argument is true or not provided setFormInitialValues will also update value and if set to false it just update value
-form.setFormInitialValues(formValue,false)
+const form = document.querySelector('jb-form');
+
+const values = form.getFormValues();
+
+form.setFormValues({
+  name: 'Joe',
+  age: 10,
+});
+
+form.setFormValues({ name: 'Joe' }, false);
 ```
-as you can see all elements have 2 values fields `value` & `initialValue`. value is a normal value of the fields but initial value is used just to be compared with value and set `isDirty` field.
-`isDirty` will be true if user change the input value from a provided initial value.
-remember `setFormValues` and `setFormInitialValues` second argument is `shouldUpdateInitialValue` that is `true` by default so when you call one it call the others so the get sync but if you want to just set one of them and not the other, just pass false in it
 
-## virtual elements
+`setFormValues(value)` updates both `value` and `initialValue` by default. Pass `false` as the second argument when you only want to change current values.
 
-you may have some custom inputs or form elements that's not quite implement jb-validation and jb-form standards but you need to put them in the form and validate them or control them like others.    
-for doing so you just need to call `addVirtualElement` function:
-
-```typescript
-// here is type of VirtualElement you need to build
-//TValue is the component normal value you always want to get and TValidationValue is the value you want to pass to validation module validators. they may be the same type or not based on your component 
-type VirtualElementConfig<TValue,TValidationValue> = {
-  //name of the field in all result returns. it's required.
-  name:string,
-  //jb-validation standard ValidationHelper object. if not provided all validation methods will skip this input
-  validation?:ValidationHelper<TValidationValue>,
-  //the function that may return value of the component
-  getValue?:()=>TValue,
-  // a function that determine if component value changed in compare to provided initialValue
-  getDirtyStatus?:()=>boolean,
-  //called whenever form `setFormValues` called and set the component value
-  setValue?:(value:TValue)=>void
-  //called whenever form `setFormInitialValues` called and set the component initial value
-  setInitialValue?:(value:TValue)=>void
-}
-
-const tagList:VirtualElement<string[],string[]> = {
-  name:'tagList',
-  validation:new ValidationHelper(...),
-  getValue: ()=>{return list},
-  //it's just an example write a real full compare function here.
-  getDirtyStatus()=>{return list.length !== initialList.length },
-  setValue(newValue)=>{ list= newValue },
-  setInitialValue(newValue)=>{ initialList= newValue },
-}
-
-// adding virtualElements
-form.virtualElements.add(tagList);
-
+```js
+form.setFormInitialValues({ name: 'Joe', age: 10 });
+form.setFormInitialValues({ name: 'Joe' }, false);
 ```
-### Form Element With Same Name (Value Collection)
 
-if 2 or more form elements have the same name, we turn them into `Map` value(custom map named `TraverseCollection`). for example:
+## Dirty state
+
+```js
+console.log(form.isDirty);
+console.log(form.getFormDirtyStatus());
+
+form.addEventListener('dirty-change', (event) => {
+  console.log(event.detail.isDirty);
+});
+```
+
+## Submit
+
+`jb-form` listens for trusted `submit` events from submit-capable child controls, prevents the original event, calls `reportValidity()`, and dispatches its own `submit` event when the form is valid.
+
+```js
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  console.log(form.getFormValues());
+});
+```
+
+## Virtual elements
+
+Use virtual elements for state that is not represented by a JB/native form control but still needs to participate in form values, dirty checks, or validation.
+
+```ts
+import { ValidationHelper } from 'jb-validation';
+
+const tagList = form.virtualElements.add({
+  name: 'tags',
+  validation: new ValidationHelper({
+    getValue: () => tags,
+    getValidations: () => [
+      {
+        validator: (value) => value.length > 0,
+        message: 'Select at least one tag',
+      },
+    ],
+  }),
+  getValue: () => tags,
+  getDirtyStatus: () => tags.length !== initialTags.length,
+  setValue: (value) => {
+    tags = value;
+  },
+  setInitialValue: (value) => {
+    initialTags = value;
+  },
+});
+
+tagList.dispatchOnChange();
+```
+
+Remove a virtual element when it is no longer part of the form:
+
+```js
+form.virtualElements.remove({ virtualElement: tagList });
+```
+
+## Same-name values
+
+When two or more named items share the same `name`, the value becomes a `TraverseCollection`, which extends `Map` and is marked with `ValueCollectionSymbol`.
 
 ```html
 <jb-form>
-  <jb-input name="personName" value="Ali">
-  <jb-input name="phoneNumber" value="1234">
-  <jb-input name="phoneNumber" value="5678">
+  <jb-input name="personName" value="Ali"></jb-input>
+  <jb-input name="phoneNumber" value="1234"></jb-input>
+  <jb-input name="phoneNumber" value="5678"></jb-input>
 </jb-form>
 ```
-```typescript
-const form = document.querySelector('form');
-console.log(form.getFormValues());
-/*
-  will log:
-  {
-    personName:"Ali",
-    phoneNumber:Map([[1,"1234"],[2,"5678"]])
-  }
-*/
+
+```js
+const values = form.getFormValues();
+console.log(values.phoneNumber instanceof Map); // true
 ```
-> this is not a any map it's TraverseCollection a map with extra properties and ability
-To see Demo and document please see:
-[Link To Demo](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform-valuecollection--docs)
 
-## Events
-jb-form add some new events to let you monitor your form in real time when something changes:
+If fields have `id`, the collection uses the `id` as the key; otherwise it uses numeric keys.
 
-```javascript
-  //called when submit button clicked or form.requestSubmit called
-  form.addEventListener('submit',onSubmit);
-  // when form dirty status change (updated on input change event)
-  form.addEventListener('dirty-change',onDirtyChange);
-  // when form validity change (updated on input change event)
-  form.addEventListener('validity-change',onValidityChange);
-  // here is the example for callback function 
-  const onSubmit = ()=>{
-    alert("submit");
-  };
-  const onDirtyChange = (e)=>{
-    //you can set react states or log its new status
-    setIsDirty(e.detail.isDirty);
-  };
-  const onValidityChange = (e)=>{
-    //you can set react states or log its new status
-    setIsValid(e.detail.isValid);
-  };
-```
-## sub form
+## Sub forms
 
-with jb-form you have ability to pace form tag inside another form and manage them individually or in overall.
+Nested `jb-form` elements can be managed individually and by a parent form.
 
 ```html
-<jb-form>
-  <jb-form name="form1">
-    <jb-input name="input1" />
+<jb-form id="parentForm">
+  <jb-form name="profile">
+    <jb-input name="firstName"></jb-input>
   </jb-form>
-  <jb-form name="form2">
-    <jb-input name="input2" />
+  <jb-form name="security">
+    <jb-input name="password"></jb-input>
   </jb-form>
 </jb-form>
 ```
-this really help you to manage pages that contain wizard forms or let separate forms in different components so your reusable component can have it's own form and still can be managed by parent page form.
+
+```js
+console.log(document.querySelector('#parentForm').getFormValues());
+```
+
+## Slots and styling
+
+`jb-form` has a default slot for child controls and layout content. It does not currently expose CSS parts or CSS variables.
 
 ## Related Docs
-- see [All JB Design system Component List](https://javadbat.github.io/design-system/) for more components.
 
-- use [Contribution Guide](https://github.com/javadbat/design-system/blob/main/docs/contribution-guide.md) if you want to contribute in this component.
+- See [`jb-form/react`](https://github.com/javadbat/jb-form/tree/main/react) if you want to use this component in React.
+- See [All JB Design System Component List](https://javadbat.github.io/design-system/) for more components.
+- Use [Contribution Guide](https://github.com/javadbat/design-system/blob/main/docs/contribution-guide.md) if you want to contribute to this component.
+
+## AI agent notes
+
+- Import `jb-form` once before using `<jb-form>`.
+- Put fields inside the default slot and give each field a `name` if its value should be collected.
+- Use `getFormValues()` for aggregate values and `setFormValues(values)` to update children by name.
+- Use `jbCheckValidity({ showError: true })` for async validation; `checkValidity()` and `reportValidity()` are synchronous.
+- Listen to `submit`, `dirty-change`, and `validity-change` for form workflows.
+- Repeated names return `TraverseCollection`, not a plain array.
+- Use `virtualElements.add(config)` for non-DOM or non-standard form state.
+- This package includes [`custom-elements.json`](./custom-elements.json) and points to it with the package.json `customElements` field. The field is documented by the Custom Elements Manifest project in [Referencing manifests from npm packages](https://github.com/webcomponents/custom-elements-manifest#referencing-manifests-from-npm-packages).
+- In `custom-elements.json`, `exports.kind: "js"` describes JavaScript/TypeScript exports and `exports.kind: "custom-element-definition"` maps the `jb-form` tag name to `JBFormWebComponent`.

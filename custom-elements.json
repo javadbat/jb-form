@@ -1,0 +1,303 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "README.md",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "lib/jb-form.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "JB Design System form coordinator web component that collects named child values, validates child controls, tracks dirty state, supports virtual elements and nested jb-form instances, and dispatches submit/dirty/validity events.",
+          "name": "JBFormWebComponent",
+          "tagName": "jb-form",
+          "customElement": true,
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "attributes": [
+            {
+              "name": "name",
+              "description": "Name used when this form is nested inside another jb-form.",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "description": "Aggregated object of named child form values. Setting it calls setFormValues.",
+              "type": {
+                "text": "FormValues"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "description": "Name attribute value used by parent jb-form traversal.",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isDirty",
+              "description": "True when any named child form element, virtual element, or sub-form is dirty.",
+              "type": {
+                "text": "boolean"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validation",
+              "description": "jb-validation helper for aggregate form validation.",
+              "type": {
+                "text": "ValidationHelper<FormValues>"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "validElements",
+              "description": "Connected native and custom form controls registered directly under this jb-form.",
+              "type": {
+                "text": "HTMLElement[]"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "virtualElements",
+              "description": "Virtual element registry with list, dictionary, add(config), and remove({ virtualElement }).",
+              "type": {
+                "text": "{ list: ReadonlyArray<VirtualElement<any, any>>; dictionary: Readonly<Record<string, VirtualElement<any, any>>>; add: Function; remove: Function }"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "subForms",
+              "description": "Nested jb-form registry with list and dictionary.",
+              "type": {
+                "text": "{ list: readonly JBFormWebComponent[]; dictionary: Readonly<Record<string, JBFormWebComponent | JBFormWebComponent[]>> }"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "formElements",
+              "description": "Internal native/custom child form element registry.",
+              "type": {
+                "text": "FormElements"
+              },
+              "readonly": true
+            }
+          ],
+          "methods": [
+            {
+              "name": "checkValidity",
+              "description": "Runs synchronous aggregate validation without showing errors.",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "name": "reportValidity",
+              "description": "Runs synchronous aggregate validation and asks child controls, virtual elements, and sub-forms to show errors.",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              }
+            },
+            {
+              "name": "jbCheckValidity",
+              "description": "Runs rich async validation for jb-validation-compatible child controls, virtual elements, and sub-forms.",
+              "parameters": [
+                {
+                  "name": "params",
+                  "type": {
+                    "text": "{ showError: boolean }"
+                  }
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "Promise<CheckValidityAsyncResult>"
+                }
+              }
+            },
+            {
+              "name": "getValidationMessages",
+              "description": "Returns validation messages for named child controls, virtual elements, and sub-forms.",
+              "return": {
+                "type": {
+                  "text": "FormValidationMessages"
+                }
+              }
+            },
+            {
+              "name": "getValidationSummary",
+              "description": "Returns validation summaries for named jb-validation-compatible controls, virtual elements, and sub-forms.",
+              "return": {
+                "type": {
+                  "text": "FormValidationSummary"
+                }
+              }
+            },
+            {
+              "name": "getValidationResult",
+              "description": "Returns full validation results for named jb-validation-compatible controls, virtual elements, and sub-forms.",
+              "return": {
+                "type": {
+                  "text": "FormValidationResult"
+                }
+              }
+            },
+            {
+              "name": "getFormValues",
+              "description": "Returns all named child values. Repeated names are returned as TraverseCollection.",
+              "return": {
+                "type": {
+                  "text": "FormValues"
+                }
+              }
+            },
+            {
+              "name": "getFormDirtyStatus",
+              "description": "Returns dirty status for named child controls, virtual elements, and sub-forms.",
+              "return": {
+                "type": {
+                  "text": "TraverseResult<boolean>"
+                }
+              }
+            },
+            {
+              "name": "setFormValues",
+              "description": "Sets values on named child controls, virtual elements, and sub-forms. Updates initial values by default.",
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "FormValues"
+                  }
+                },
+                {
+                  "name": "shouldUpdateInitialValue",
+                  "type": {
+                    "text": "boolean"
+                  },
+                  "default": "true"
+                }
+              ]
+            },
+            {
+              "name": "setFormInitialValues",
+              "description": "Sets initial values used for dirty checks. Updates current values by default.",
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "FormValues"
+                  }
+                },
+                {
+                  "name": "shouldUpdateValue",
+                  "type": {
+                    "text": "boolean"
+                  },
+                  "default": "true"
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "submit",
+              "description": "Dispatched after a trusted child submit is intercepted and reportValidity returns true."
+            },
+            {
+              "name": "dirty-change",
+              "description": "Dispatched when aggregate dirty state changes. event.detail.isDirty contains the new boolean."
+            },
+            {
+              "name": "validity-change",
+              "description": "Dispatched when aggregate synchronous validity changes. event.detail.isValid contains the new boolean."
+            },
+            {
+              "name": "change",
+              "description": "Dispatched by the form when a virtual element changes. Child controls may also bubble their own change events through jb-form."
+            },
+            {
+              "name": "form-change",
+              "description": "Dispatched from child controls when setFormValues changes a child value programmatically."
+            },
+            {
+              "name": "init",
+              "description": "Dispatched from connectedCallback after child element scanning starts."
+            },
+            {
+              "name": "disconnect",
+              "description": "Dispatched from disconnectedCallback."
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "Form controls, native controls, nested jb-form elements, buttons, and layout content."
+            }
+          ],
+          "cssParts": [],
+          "cssProperties": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "JBFormWebComponent",
+          "declaration": {
+            "name": "JBFormWebComponent",
+            "module": "lib/jb-form.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "jb-form",
+          "declaration": {
+            "name": "JBFormWebComponent",
+            "module": "lib/jb-form.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "VirtualElement",
+          "declaration": {
+            "name": "VirtualElement",
+            "module": "lib/virtual-element.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TraverseCollection",
+          "declaration": {
+            "name": "TraverseCollection",
+            "module": "lib/collections.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getInvalidElements",
+          "declaration": {
+            "name": "getInvalidElements",
+            "module": "lib/utils.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

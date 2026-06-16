@@ -21,6 +21,7 @@
   "files": [
     "LICENSE",
     "README.md",
+    "custom-elements.json",
     "lib/",
     "lib/types.ts",
     "dist/",
@@ -29,6 +30,7 @@
   "sideEffects": ["*.js"],
   "main": "index.js",
   "module": "index.js",
+  "customElements": "custom-elements.json",
   "homepage": "https://github.com/javadbat/jb-form",
   "repository": {
     "type": "git",
