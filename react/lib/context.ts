@@ -11,14 +11,14 @@ export type useJBFormValueArgs = {
   formRef?: RefObject<JBFormWebComponent | null> 
 }
 export type UseJBFormValueResult<TValue> = {
-  value:TValue
+  value:TValue | null
 }
 /**
  * Help you get latest value of the form or form element value.
  * because jb-form is a web-component we use events to watch for value change. so if you don't get form values exactly when you need update form args array and add events that need listened to like `input`
  */
 export const useJBFormValue = <TValue=unknown>(args: useJBFormValueArgs):UseJBFormValueResult<TValue> => {
-  const [value, setValue] = useState<TValue>(null)
+  const [value, setValue] = useState<TValue | null>(null)
   // const defaultForm = useJBForm()
   const events = args.events ?? ["change", "form-change"];
   useEffect(() => {

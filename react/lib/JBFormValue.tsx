@@ -3,30 +3,30 @@ import { useJBForm } from "./context.js"
 import type { VirtualElement } from "jb-form"
 export type Props<TValue> = {
   name: string,
-  value?: TValue,
+  value?: TValue | null,
   /**
    * when this virtual value changes this callback called and new Value provided
    * @param value 
    */
-  onChange?: (value: TValue) => void,
+  onChange?: (value: TValue | null) => void,
   /**
    * render value base on your need
    * @param value 
    * @returns 
    */
-  children?:(value:TValue)=>ReactNode
+  children?:(value:TValue | null)=>ReactNode
 }
 /**
  * Easiest way to register Virtual value to the form, Will provide value to JBForm Directly for easier multi form value provider
  */
 export function JBFormValue<TValue = unknown>({ value, name, onChange,children }: Props<TValue>) {
-  const valueRef = useRef<TValue>(null);
+  const valueRef = useRef<TValue | null>(null);
   // update when value ref changes
-  const [valueState, setValueState] = useState<TValue>(null);
+  const [valueState, setValueState] = useState<TValue | null>(null);
   const form = useJBForm();
   
   useEffect(() => {
-    let vElement: VirtualElement<TValue, unknown> | null = null;
+    let vElement: VirtualElement<TValue | null, unknown> | null = null;
     if (form?.virtualElements && name) {
       vElement = form.virtualElements.add({
         name: name,
@@ -37,10 +37,14 @@ export function JBFormValue<TValue = unknown>({ value, name, onChange,children }
         }
       })
     }
-    return () => form?.virtualElements.remove({ virtualElement: vElement })
+    return () => {
+      if (vElement) {
+        form?.virtualElements.remove({ virtualElement: vElement });
+      }
+    }
   }, [form, name, onChange]);
   useEffect(() => {
-    valueRef.current = value;
+    valueRef.current = value ?? null;
   }, [value]);
   
   // biome-ignore lint/correctness/useExhaustiveDependencies: <valid>
