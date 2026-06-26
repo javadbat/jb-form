@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, } from "react";
 import { JBButton } from "jb-button/react";
 import 'jb-form';
 import { getInvalidElements } from 'jb-form';
-import { JBForm, JBFormValue, useJBFormValue, type Props } from 'jb-form/react';
+import { JBForm, JBFormValue, useJBFormValue } from 'jb-form/react';
 import { PersonForm, BankForm, ProductForm, BookForm } from "./samples/TestForms";
 import type { Meta, StoryObj } from '@storybook/react';
 
@@ -12,12 +12,12 @@ import { JBInput } from "jb-input/react";
 import { JBNumberInput } from "jb-number-input/react";
 
 
-const meta: Meta<Props> = {
+const meta = {
   title: "Components/form elements/JBForm",
   component: JBForm,
-};
+} satisfies Meta<typeof JBForm>;
 export default meta;
-type Story = StoryObj<typeof JBForm>;
+type Story = StoryObj<typeof meta>;
 
 export const Normal: Story = {
   args: {
