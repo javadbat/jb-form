@@ -213,7 +213,7 @@ export const FormValue: Story = {
     const setValue = () => {
       ref.current?.setFormValues(args.value)
     }
-    const [bookId, setBookId] = useState(10);
+    const [bookId, setBookId] = useState<number | null>(10);
     const formValues = useJBFormValue({formRef:ref});
     useEffect(()=>{
       console.log("already set value",formValues);
@@ -249,7 +249,7 @@ export const UseJBFormValue: Story = {
     const setValue = () => {
       ref.current?.setFormValues(args.value)
     }
-    const [bookId, setBookId] = useState(10);
+    const [bookId, setBookId] = useState<number | null>(10);
     const formValues = useJBFormValue({formRef:ref});
     const {value:bookName} = useJBFormValue<string>({formRef:ref, name:"bookName"});
     useEffect(()=>{
