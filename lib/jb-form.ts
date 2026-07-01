@@ -154,7 +154,7 @@ export class JBFormWebComponent extends HTMLElement {
           if (invalidElement == undefined || invalidElement.validation === undefined) {
             return true;
           } else {
-            invalidElement.validation.resultSummary.message;
+            invalidElement.validation.resultSummary?.message;
           }
           return false
         },
@@ -169,7 +169,7 @@ export class JBFormWebComponent extends HTMLElement {
           if (invalidForm == undefined) {
             return true;
           } else {
-            invalidForm.validation.resultSummary.message;
+            invalidForm.validation.resultSummary?.message;
           }
           return false;
         },
@@ -251,7 +251,7 @@ export class JBFormWebComponent extends HTMLElement {
     return this.#traverseNamedElements(
       (formElement) => formElement.validationMessage ?? null,
       (vElement) => vElement.validation?.resultSummary?.message ?? null,
-      (subForm) => subForm.validation.resultSummary.message ?? null,
+      (subForm) => subForm.validation.resultSummary?.message ?? null,
     );
   }
   /**
@@ -262,7 +262,7 @@ export class JBFormWebComponent extends HTMLElement {
     return this.#traverseNamedElements(
       (formElement) => formElement.validation?.resultSummary ?? null,
       (vElement) => vElement.validation?.resultSummary ?? null,
-      (subForm) => subForm.validation.resultSummary,
+      (subForm) => subForm.validation.resultSummary ?? null,
     );
   }
   /**
