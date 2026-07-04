@@ -3,8 +3,9 @@ import type { ReactComponentBuildConfig, WebComponentBuildConfig } from "../../t
 export const webComponentList: WebComponentBuildConfig[] = [
   {
     name: "jb-form",
-    path: "./lib/jb-form.ts",
-    outputPath: "./dist/jb-form.js",
+    path: "./web-component/lib/jb-form.ts",
+    outputPath: "./web-component/dist/jb-form.js",
+    tsConfigPath: "./web-component/tsconfig.json",
     umdName: "JBForm",
     external: ["jb-validation", "jb-core"],
     globals: {

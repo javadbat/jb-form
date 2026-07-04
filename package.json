@@ -22,22 +22,22 @@
   "files": [
     "LICENSE",
     "README.md",
-    "custom-elements.json",
-    "lib/",
-    "lib/types.ts",
-    "dist/",
+    "web-component/custom-elements.json",
+    "web-component/lib/",
+    "web-component/lib/types.ts",
+    "web-component/dist/",
     "react/"
   ],
   "sideEffects": ["*.js"],
   "main": "index.js",
   "module": "index.js",
-  "customElements": "custom-elements.json",
+  "customElements": "web-component/custom-elements.json",
   "homepage": "https://github.com/javadbat/jb-form",
   "repository": {
     "type": "git",
     "url": "https://github.com/javadbat/jb-form"
   },
-  "types": "./dist/jb-form.d.ts",
+  "types": "./web-component/dist/jb-form.d.ts",
   "dependencies": {
     "jb-validation":"^0.4.0",
     "jb-core":">=0.26.0"
