@@ -30,7 +30,7 @@ export interface JBFormInputStandards<TValue = string> extends HTMLElement {
   /**
    * when reset method of the forms called
    */
-  formResetCallback?: () => void,
+  formResetCallback: () => void,
   /**
    * when form disable or enable function called
    */
@@ -95,7 +95,11 @@ export type VirtualElementConfig<TValue, TValidationValue> = {
   /**
 * @property this callback function will be called in case of form setInitialValue called.
 */
-  setInitialValue?: (value: TValue) => void
+  setInitialValue?: (value: TValue) => void,
+  /**
+   * Restore the virtual element to its initial value.
+   */
+  reset?: () => void,
 }
 
 export type VirtualElementCallbacks = {

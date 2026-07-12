@@ -80,6 +80,7 @@ import 'jb-form';
 | `getFormDirtyStatus()` | `TraverseResult<boolean>` | Returns dirty status for named child controls, virtual elements, and sub-forms. |
 | `setFormValues(value, shouldUpdateInitialValue?)` | `void` | Sets values by `name`. Also updates initial values unless the second argument is `false`. |
 | `setFormInitialValues(value, shouldUpdateValue?)` | `void` | Sets initial values used for dirty checks. Also updates current values unless the second argument is `false`. |
+| `reset()` | `void` | Restores custom controls, native controls, virtual elements, and nested forms to their initial values and clears validation state. |
 
 ### Events
 
@@ -145,6 +146,12 @@ form.setFormInitialValues({ name: 'Joe', age: 10 });
 form.setFormInitialValues({ name: 'Joe' }, false);
 ```
 
+Reset the complete form tree:
+
+```js
+form.reset();
+```
+
 ## Dirty state
 
 ```js
@@ -192,6 +199,9 @@ const tagList = form.virtualElements.add({
   },
   setInitialValue: (value) => {
     initialTags = value;
+  },
+  reset: () => {
+    tags = [...initialTags];
   },
 });
 

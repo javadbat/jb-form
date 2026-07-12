@@ -42,6 +42,12 @@ export class VirtualElementList {
       }
     }
   }
+  reset() {
+    for (const virtualElement of this.#list) {
+      virtualElement.reset?.();
+      virtualElement.validation?.reset();
+    }
+  }
   /**
  * @public add virtual element let you register some non standard form element into this form to activate all form helpers and methods for them
  * @param element the element you want to register

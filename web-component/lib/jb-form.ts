@@ -344,6 +344,27 @@ export class JBFormWebComponent extends HTMLElement {
     }
   }
 
+  /**
+   * Restore all controls to their initial values and clear validation state.
+   */
+  reset() {
+    const wasDirty = this.isDirty;
+    this.#formElements.reset();
+    this.#virtualElements.reset();
+    this.#subForms.reset();
+    this.#validation.reset();
+
+    const isDirty = this.isDirty;
+    if (wasDirty !== isDirty) {
+      this.#dispatchDirtyChange(isDirty);
+    }
+    this.#prevIsDirty = isDirty;
+  }
+
+  formResetCallback() {
+    this.reset();
+  }
+
   #traverseFormNamedElements<T>(extractFunction: ExtractFunction<T>): TraverseResult<T> {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
@@ -379,9 +400,7 @@ export class JBFormWebComponent extends HTMLElement {
     const checkForDirty = () => {
       const currentIsDirty = this.isDirty;
       if (currentIsDirty !== this.#prevIsDirty) {
-        //this event should not bubble because parent form event bind should not capture sub form event due to isDirty  may be set false in sub form but still true in parent
-        const event = new CustomEvent("dirty-change", { bubbles: false, cancelable: false, composed: true, detail: { isDirty: currentIsDirty } });
-        this.dispatchEvent(event);
+        this.#dispatchDirtyChange(currentIsDirty);
         this.#prevIsDirty = currentIsDirty;
       }
     };
@@ -409,6 +428,11 @@ export class JBFormWebComponent extends HTMLElement {
         checkForValidity();
       }
     }
+  }
+  #dispatchDirtyChange(isDirty: boolean) {
+    // This event must not bubble because a nested form can become clean while its parent remains dirty.
+    const event = new CustomEvent("dirty-change", { bubbles: false, cancelable: false, composed: true, detail: { isDirty } });
+    this.dispatchEvent(event);
   }
   /**
    * @description this function would find all internal jb-form elements and register them as it sub forms

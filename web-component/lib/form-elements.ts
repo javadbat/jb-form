@@ -11,6 +11,18 @@ export class FormElements {
   get allElements() {
     return [...Array.from(this.customElements.keys()), ...Array.from(this.nativeElements.keys())]
   }
+  reset() {
+    for (const element of this.customElements.keys()) {
+      if (element.localName !== 'jb-form') {
+        // Runtime registration can include third-party form-associated custom elements
+        // that do not implement the JBFormInputStandards contract.
+        element.formResetCallback?.();
+      }
+    }
+    for (const element of this.nativeElements.keys()) {
+      this.#resetNativeElement(element);
+    }
+  }
   constructor(jbForm: JBFormWebComponent) {
     this.form = document.createElement('form');
     this.form.setAttribute('id', uniqueId('form'));
@@ -87,6 +99,33 @@ export class FormElements {
       el instanceof HTMLFieldSetElement ||
       el instanceof HTMLOutputElement ||
       el instanceof HTMLObjectElement;
+  }
+  #resetNativeElement(element: NativeFormElements) {
+    // Native controls do not expose formResetCallback(). These assignments mirror
+    // the defaults restored by HTMLFormElement.reset().
+    if (element instanceof HTMLInputElement) {
+      if (element.type === 'checkbox' || element.type === 'radio') {
+        element.checked = element.defaultChecked;
+      } else if (element.type === 'file') {
+        element.value = '';
+      } else {
+        element.value = element.defaultValue;
+      }
+      return;
+    }
+    if (element instanceof HTMLSelectElement) {
+      for (const option of element.options) {
+        option.selected = option.defaultSelected;
+      }
+      return;
+    }
+    if (element instanceof HTMLTextAreaElement) {
+      element.value = element.defaultValue;
+      return;
+    }
+    if (element instanceof HTMLOutputElement) {
+      element.value = element.defaultValue;
+    }
   }
   #handleUnregisteredWebComponent(el: HTMLElement) {
     if (el.localName.includes('-') && !el.matches(':defined')) {

@@ -1,5 +1,16 @@
 # changelog
 
+## Unreleased
+
+### Added
+
+- Added `reset()` to restore custom, native, virtual, and nested form values and clear validation state.
+- Added virtual-element reset callbacks.
+
+### Changed
+
+- Made `formResetCallback()` required by `JBFormInputStandards`.
+
 ## [0.11.0] - 2026-04-18
 ### new features
 - add TraverseCollection type (extended map) for collection value with the same name

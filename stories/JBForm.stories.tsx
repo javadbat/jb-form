@@ -10,6 +10,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type JBFormEventType, type JBFormWebComponent, TraverseCollection } from "jb-form";
 import { JBInput } from "jb-input/react";
 import { JBNumberInput } from "jb-number-input/react";
+import { expect, fn, waitFor } from 'storybook/test';
 
 
 const meta = {
@@ -23,6 +24,66 @@ export const Normal: Story = {
   args: {
     name: "testForm"
   }
+};
+
+export const Reset: Story = {
+  render: () => {
+    const formRef = useRef<JBFormWebComponent>(null);
+    return (
+      <JBForm ref={formRef}>
+        <JBInput name="title" value="initial title" initialValue="initial title" />
+        <JBInput name="requiredField" value="" initialValue="" required />
+        <input name="nativeField" defaultValue="native initial" />
+        <JBForm name="nested">
+          <JBInput name="nestedTitle" value="nested initial" initialValue="nested initial" />
+        </JBForm>
+        <JBButton onClick={() => formRef.current?.reset()}>Reset form</JBButton>
+      </JBForm>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const form = canvasElement.querySelector<JBFormWebComponent>('jb-form')!;
+    const title = form.querySelector<import('jb-input').JBInputWebComponent>('jb-input[name="title"]')!;
+    const requiredField = form.querySelector<import('jb-input').JBInputWebComponent>('jb-input[name="requiredField"]')!;
+    const nativeField = form.querySelector<HTMLInputElement>('input[name="nativeField"]')!;
+    const nestedTitle = form.querySelector<import('jb-input').JBInputWebComponent>('jb-form jb-input[name="nestedTitle"]')!;
+    const onDirtyChange = fn();
+    let virtualValue = 'virtual initial';
+    const resetVirtualValue = fn(() => {
+      virtualValue = 'virtual initial';
+    });
+
+    form.addEventListener('dirty-change', onDirtyChange);
+    await waitFor(() => expect(form.validElements.length).toBeGreaterThanOrEqual(3));
+    const virtualElement = form.virtualElements.add({
+      name: 'virtualField',
+      getValue: () => virtualValue,
+      getDirtyStatus: () => virtualValue !== 'virtual initial',
+      reset: resetVirtualValue,
+    });
+
+    title.value = 'changed title';
+    nativeField.value = 'changed native';
+    nestedTitle.value = 'changed nested';
+    virtualValue = 'changed virtual';
+    virtualElement.dispatchOnChange();
+    requiredField.reportValidity();
+
+    expect(requiredField.validation.result).not.toBeNull();
+    form.reset();
+
+    await waitFor(() => {
+      expect(title.value).toBe('initial title');
+      expect(nativeField.value).toBe('native initial');
+      expect(nestedTitle.value).toBe('nested initial');
+      expect(virtualValue).toBe('virtual initial');
+      expect(resetVirtualValue).toHaveBeenCalledOnce();
+      expect(requiredField.validation.result).toBeNull();
+      expect(requiredField.hasState('invalid')).toBe(false);
+      expect(form.isDirty).toBe(false);
+      expect(onDirtyChange).toHaveBeenCalledWith(expect.objectContaining({ detail: { isDirty: false } }));
+    });
+  },
 };
 
 const defaultFormValue = {

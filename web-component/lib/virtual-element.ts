@@ -13,6 +13,7 @@ export class VirtualElement<TValue, TValidationValue> {
   getDirtyStatus?: () => boolean;
   setValue?: (value: TValue) => void;
   setInitialValue?: (value: TValue) => void;
+  reset?: () => void;
   #callbacks: {
     onChange: () => void
   } = {
@@ -32,6 +33,7 @@ export class VirtualElement<TValue, TValidationValue> {
     this.getValue = config.getValue;
     this.setInitialValue = config.setInitialValue;
     this.setValue = config.setValue;
+    this.reset = config.reset;
   }
   attachCallbacks(callbacks: VirtualElementCallbacks) {
     this.#callbacks = callbacks;

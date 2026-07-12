@@ -32,6 +32,11 @@ export class SubFormList {
       }
     }
   }
+  reset() {
+    for (const subForm of this.#list) {
+      subForm.reset();
+    }
+  }
   traverse<T>(extractFunction: FormExtractFunction<T>): TraverseResult<T> {
     type ValueType = ReturnType<typeof extractFunction>;
     const result: TraverseResult<ValueType> = {};
