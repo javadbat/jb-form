@@ -4,7 +4,7 @@ import 'jb-form';
 import { getInvalidElements } from 'jb-form';
 import { JBForm, JBFormValue, useJBFormValue } from 'jb-form/react';
 import { PersonForm, BankForm, ProductForm, BookForm } from "./samples/TestForms";
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 // eslint-disable-next-line no-duplicate-imports
 import { type JBFormEventType, type JBFormWebComponent, TraverseCollection } from "jb-form";
