@@ -201,7 +201,9 @@ export class JBFormWebComponent extends HTMLElement {
       return item.reportValidity() && acc;
     }, true);
     // isAllValid = isAllValid && this.#formReportValidity();
-    return isAllValid && virtualResult && formResult;
+    const result = isAllValid && virtualResult && formResult;
+    if (this.#internals) this.#internals.ariaInvalid = result ? "false" : "true";
+    return result;
   }
   #dispatchSubmitEvent(e: SubmitEvent) {
     const event = new SubmitEvent('submit', { ...e });
