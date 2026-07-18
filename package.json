@@ -16,7 +16,7 @@
     "web-component",
     "react"
   ],
-  "version": "0.11.0",
+  "version": "0.12.0",
   "bugs": "https://github.com/javadbat/jb-form/issues",
   "license": "MIT",
   "files": [
@@ -50,7 +50,7 @@
     "./*": "./*"
   },
   "dependencies": {
-    "jb-validation":"^0.4.0",
-    "jb-core":">=0.26.0"
+    "jb-validation":"^1.0.0",
+    "jb-core":">=0.30.0"
   }
 }

@@ -30,12 +30,13 @@ export const Reset: Story = {
   render: () => {
     const formRef = useRef<JBFormWebComponent>(null);
     return (
-      <JBForm ref={formRef}>
-        <JBInput name="title" value="initial title" initialValue="initial title" />
-        <JBInput name="requiredField" value="" initialValue="" required />
+      <JBForm ref={formRef} style={{display:'flex', flexDirection:"column", gap:'1rem'}}>
+        <JBInput label="title" name="title" value="initial title" initialValue="initial title" />
+        <JBInput label="Required Field" name="requiredField" value="" initialValue="" required />
         <input name="nativeField" defaultValue="native initial" />
-        <JBForm name="nested">
-          <JBInput name="nestedTitle" value="nested initial" initialValue="nested initial" />
+        <JBForm name="nested" style={{display:'flex', flexDirection:"row", gap:'1rem'}}>
+          <JBInput label= "Nested Title" name="nestedTitle" value="nested initial" initialValue="nested initial" message="this input is in nested jb-form element"/>
+          <JBInput label= "Nested Age" name="nestedAge" value="nested age" initialValue="nested age" />
         </JBForm>
         <JBButton onClick={() => formRef.current?.reset()}>Reset form</JBButton>
       </JBForm>
