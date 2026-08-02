@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, } from "react";
 import { JBButton } from "jb-button/react";
 import 'jb-form';
 import { getInvalidElements } from 'jb-form';
-import { JBForm, JBFormValue, useJBFormValue } from 'jb-form/react';
+import { JBForm, JBFormValue, useJBForm, useJBFormValue } from 'jb-form/react';
 import { PersonForm, BankForm, ProductForm, BookForm } from "./samples/TestForms";
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -10,7 +10,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type JBFormEventType, type JBFormWebComponent, TraverseCollection } from "jb-form";
 import { JBInput } from "jb-input/react";
 import { JBNumberInput } from "jb-number-input/react";
-import { expect, fn, waitFor } from 'storybook/test';
+import { expect, fn, userEvent, waitFor } from 'storybook/test';
 
 
 const meta = {
@@ -24,6 +24,73 @@ export const Normal: Story = {
   args: {
     name: "testForm"
   }
+};
+
+export const ImperativeMethods: Story = {
+  render: () => {
+    const formRef = useRef<JBFormWebComponent>(null);
+    return (
+      <JBForm ref={formRef} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <JBInput name="title" value="Initial title" initialValue="Initial title" />
+        <JBInput name="requiredField" required value="" initialValue="" />
+      </JBForm>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const form = canvasElement.querySelector<JBFormWebComponent>('jb-form');
+    const title = form?.querySelector<import('jb-input').JBInputWebComponent>('jb-input[name="title"]');
+
+    expect(form).toBeTruthy();
+    await waitFor(() => expect(form?.validElements.length).toBeGreaterThanOrEqual(2));
+    expect(form?.getFormValues().title).toBe('Initial title');
+    expect(form?.checkValidity()).toBe(false);
+    expect(form?.reportValidity()).toBe(false);
+
+    form!.setFormValues({ title: 'Changed title', requiredField: 'Complete' }, false);
+    await waitFor(() => {
+      expect(title?.value).toBe('Changed title');
+      expect(form?.getFormValues().requiredField).toBe('Complete');
+      expect(form?.isDirty).toBe(true);
+      expect(form?.checkValidity()).toBe(true);
+    });
+
+    form!.setFormInitialValues({ title: 'Baseline title', requiredField: 'Baseline field' });
+    form!.setFormValues({ title: 'Temporary title' }, false);
+    expect(form?.getFormValues().title).toBe('Temporary title');
+
+    form!.reset();
+    await waitFor(() => {
+      expect(form?.getFormValues().title).toBe('Baseline title');
+      expect(form?.getFormValues().requiredField).toBe('Baseline field');
+      expect(form?.isDirty).toBe(false);
+    });
+  },
+};
+
+function FormContextReader() {
+  const form = useJBForm();
+  const [value, setValue] = useState('');
+  return (
+    <div>
+      <button type="button" onClick={() => setValue(String(form?.getFormValues().title ?? ''))}>Read form context</button>
+      <output data-testid="context-value">{value}</output>
+    </div>
+  );
+}
+
+export const UseJBForm: Story = {
+  render: () => (
+    <JBForm>
+      <JBInput name="title" value="Context title" />
+      <FormContextReader />
+    </JBForm>
+  ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(canvasElement.querySelector('button')!);
+    await waitFor(() => {
+      expect(canvasElement.querySelector('[data-testid="context-value"]')?.textContent).toBe('Context title');
+    });
+  },
 };
 
 export const Reset: Story = {

@@ -15,18 +15,18 @@ JB Design System form coordinator for validation, dirty checks, value collection
 
 ## When to use
 
-Use `jb-form` when a group of fields needs aggregate validation, value collection, dirty-state tracking, virtual fields, or nested form sections.
+Use `jb-form` when a group of fields needs aggregate validation, value collection, dirty-state tracking, virtual fields, or nested form sections. The basic setup is shown in the [normal form demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--normal).
 
 Use a native `<form>` when you only need browser-native submission and do not need JB aggregate helpers.
 
 ## Demo
 
-- [Storybook](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform)
-- [Value collection demo](https://javadbat.github.io/design-system/?path=/docs/components-form-elements-jbform-valuecollection--docs)
+- [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--overview)
+- [Value collection demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform-valuecollection--docs)
 
 ## Using With JS Frameworks
 
-<a href="https://github.com/javadbat/jb-form/tree/main/react" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/React.js-jb--form%2Freact-000.svg?logo=react&logoColor=%2361DAFB" height="30" /></a>
+<a href="https://github.com/javadbat/jb-form/tree/main/react" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/React.js-jb--form%2Freact-000.svg?logo=react&logoColor=%2361DAFB" height="30" /></a> See the [React documentation](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform-react-readme--docs).
 
 Other integrations: <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#angular" target="_blank" rel="noopener noreferrer">Angular</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#vue" target="_blank" rel="noopener noreferrer">Vue</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#nuxt" target="_blank" rel="noopener noreferrer">Nuxt</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#svelte" target="_blank" rel="noopener noreferrer">Svelte</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#sveltekit" target="_blank" rel="noopener noreferrer">SvelteKit</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#solidjs" target="_blank" rel="noopener noreferrer">SolidJS</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#lit" target="_blank" rel="noopener noreferrer">Lit</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#nextjs" target="_blank" rel="noopener noreferrer">Next.js</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#astro" target="_blank" rel="noopener noreferrer">Astro</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#blazor" target="_blank" rel="noopener noreferrer">Blazor</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#server-rendered-templates" target="_blank" rel="noopener noreferrer">Server-rendered templates</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#wordpress" target="_blank" rel="noopener noreferrer">WordPress</a> · <a href="https://javadbat.github.io/design-system/?path=/docs/getting-started-framework-integration--docs#alpinejs-and-htmx" target="_blank" rel="noopener noreferrer">Alpine.js and HTMX</a>
 
@@ -53,52 +53,52 @@ import 'jb-form';
 
 | name | type | default | description |
 | --- | --- | --- | --- |
-| `name` | `string` | `""` | Name used when this form is nested inside another `jb-form`. |
+| `name` | `string` | `""` | Name used when this form is nested inside another `jb-form`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-tree-test) |
 
 ### Properties
 
 | name | type | readonly | description |
 | --- | --- | --- | --- |
-| `value` | `FormValues` | no | Aggregated object of named child values. Setting it calls `setFormValues(value)`. |
-| `name` | `string` | no | Name attribute value used by parent `jb-form` traversal. |
-| `isDirty` | `boolean` | yes | `true` when any named child control, virtual element, or sub-form is dirty. |
-| `validation` | `ValidationHelper<FormValues>` | yes | Aggregate `jb-validation` helper. |
-| `validElements` | `HTMLElement[]` | yes | Connected native and custom form controls registered directly under this `jb-form`. |
-| `virtualElements` | object | yes | Virtual element registry: `list`, `dictionary`, `add(config)`, and `remove({ virtualElement })`. |
-| `subForms` | object | yes | Nested `jb-form` registry: `list` and `dictionary`. |
-| `formElements` | `FormElements` | yes | Internal native/custom child form element registry. |
+| `value` | `FormValues` | no | Aggregated object of named child values. Setting it calls `setFormValues(value)`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-value) |
+| `name` | `string` | no | Name attribute value used by parent `jb-form` traversal. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-tree-test) |
+| `isDirty` | `boolean` | yes | `true` when any named child control, virtual element, or sub-form is dirty. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) |
+| `validation` | `ValidationHelper<FormValues>` | yes | Aggregate `jb-validation` helper. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
+| `validElements` | `HTMLElement[]` | yes | Connected native and custom form controls registered directly under this `jb-form`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
+| `virtualElements` | object | yes | Virtual element registry: `list`, `dictionary`, `add(config)`, and `remove({ virtualElement })`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-value) |
+| `subForms` | object | yes | Nested `jb-form` registry: `list` and `dictionary`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-tree-test) |
+| `formElements` | `FormElements` | yes | Internal native/custom child form element registry. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
 
 ### Methods
 
 | name | returns | description |
 | --- | --- | --- |
-| `checkValidity()` | `boolean` | Runs synchronous aggregate validation without showing errors. |
-| `reportValidity()` | `boolean` | Runs synchronous aggregate validation and asks children to show errors. |
-| `jbCheckValidity({ showError })` | `Promise<CheckValidityAsyncResult>` | Runs rich async validation for `jb-validation` compatible children, virtual elements, and sub-forms. |
-| `getValidationMessages()` | `FormValidationMessages` | Returns validation messages for named child controls, virtual elements, and sub-forms. |
-| `getValidationSummary()` | `FormValidationSummary` | Returns validation summaries for named `jb-validation` compatible items. |
-| `getValidationResult()` | `FormValidationResult` | Returns full validation results for named `jb-validation` compatible items. |
-| `getFormValues()` | `FormValues` | Returns all named child values. Repeated names become `TraverseCollection`. |
-| `getFormDirtyStatus()` | `TraverseResult<boolean>` | Returns dirty status for named child controls, virtual elements, and sub-forms. |
-| `setFormValues(value, shouldUpdateInitialValue?)` | `void` | Sets values by `name`. Also updates initial values unless the second argument is `false`. |
-| `setFormInitialValues(value, shouldUpdateValue?)` | `void` | Sets initial values used for dirty checks. Also updates current values unless the second argument is `false`. |
-| `reset()` | `void` | Restores custom controls, native controls, virtual elements, and nested forms to their initial values and clears validation state. |
+| `checkValidity()` | `boolean` | Runs synchronous aggregate validation without showing errors. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) |
+| `reportValidity()` | `boolean` | Runs synchronous aggregate validation and asks children to show errors. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) |
+| `jbCheckValidity({ showError })` | `Promise<CheckValidityAsyncResult>` | Runs rich async validation for `jb-validation` compatible children, virtual elements, and sub-forms. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--spot-invalid-element-test) |
+| `getValidationMessages()` | `FormValidationMessages` | Returns validation messages for named child controls, virtual elements, and sub-forms. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
+| `getValidationSummary()` | `FormValidationSummary` | Returns validation summaries for named `jb-validation` compatible items. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
+| `getValidationResult()` | `FormValidationResult` | Returns full validation results for named `jb-validation` compatible items. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
+| `getFormValues()` | `FormValues` | Returns all named child values. Repeated names become `TraverseCollection`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-value) |
+| `getFormDirtyStatus()` | `TraverseResult<boolean>` | Returns dirty status for named child controls, virtual elements, and sub-forms. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-tree-test) |
+| `setFormValues(value, shouldUpdateInitialValue?)` | `void` | Sets values by `name`. Also updates initial values unless the second argument is `false`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) |
+| `setFormInitialValues(value, shouldUpdateValue?)` | `void` | Sets initial values used for dirty checks. Also updates current values unless the second argument is `false`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) |
+| `reset()` | `void` | Restores custom controls, native controls, virtual elements, and nested forms to their initial values and clears validation state. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--reset) |
 
 ### Events
 
 | event | detail | description |
 | --- | --- | --- |
-| `submit` | none | Dispatched after a trusted child submit is intercepted and `reportValidity()` returns `true`. |
-| `dirty-change` | `{ isDirty: boolean }` | Dispatched when aggregate dirty state changes. |
-| `validity-change` | `{ isValid: boolean }` | Dispatched when aggregate synchronous validity changes. |
-| `change` | none | Dispatched by the form when a virtual element changes. Child controls may also bubble their own `change` events through `jb-form`. |
-| `form-change` | none | Dispatched from a child control when `setFormValues()` changes it programmatically. |
-| `init` | none | Dispatched from `connectedCallback` after child element scanning starts. |
-| `disconnect` | none | Dispatched from `disconnectedCallback`. |
+| `submit` | none | Dispatched after a trusted child submit is intercepted and `reportValidity()` returns `true`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
+| `dirty-change` | `{ isDirty: boolean }` | Dispatched when aggregate dirty state changes. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-tree-test) |
+| `validity-change` | `{ isValid: boolean }` | Dispatched when aggregate synchronous validity changes. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test) |
+| `change` | none | Dispatched by the form when a virtual element changes. Child controls may also bubble their own `change` events through `jb-form`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-value) |
+| `form-change` | none | Dispatched from a child control when `setFormValues()` changes it programmatically. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) |
+| `init` | none | Dispatched from `connectedCallback` after child element scanning starts. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--normal) |
+| `disconnect` | none | Dispatched from `disconnectedCallback`. [Demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--normal) |
 
 ## Validation
 
-Use `checkValidity()` for a silent synchronous check and `reportValidity()` to show child validation messages.
+Use `checkValidity()` for a silent synchronous check and `reportValidity()` to show child validation messages; compare both flows in the [imperative methods demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods).
 
 ```js
 const form = document.querySelector('jb-form');
@@ -107,7 +107,7 @@ const isValid = form.checkValidity();
 const isValidAndShown = form.reportValidity();
 ```
 
-Use `jbCheckValidity()` when async validations are involved. It validates JB validation-compatible child controls, virtual elements, and sub-forms and returns a tree result with element references.
+Use `jbCheckValidity()` when async validations are involved. It validates JB validation-compatible child controls, virtual elements, and sub-forms and returns a tree result with element references, as shown in the [invalid-element demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--spot-invalid-element-test).
 
 ```js
 import { getInvalidElements } from 'jb-form';
@@ -116,7 +116,7 @@ const result = await form.jbCheckValidity({ showError: true });
 const invalidElements = getInvalidElements(result);
 ```
 
-Detailed validation helpers:
+Detailed validation helpers are exercised in the [form validation demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test):
 
 ```js
 form.getValidationMessages();
@@ -126,7 +126,7 @@ form.getValidationResult();
 
 ## Value control
 
-`jb-form` collects values from named direct child controls, virtual elements, and named sub-forms.
+`jb-form` collects values from named direct child controls, virtual elements, and named sub-forms. See the [value collection demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-value) for direct reads and updates.
 
 ```js
 const form = document.querySelector('jb-form');
@@ -141,14 +141,16 @@ form.setFormValues({
 form.setFormValues({ name: 'Joe' }, false);
 ```
 
-`setFormValues(value)` updates both `value` and `initialValue` by default. Pass `false` as the second argument when you only want to change current values.
+`setFormValues(value)` updates both `value` and `initialValue` by default. Pass `false` as the second argument when you only want to change current values; the [imperative methods demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) shows both options.
 
 ```js
 form.setFormInitialValues({ name: 'Joe', age: 10 });
 form.setFormInitialValues({ name: 'Joe' }, false);
 ```
 
-Reset the complete form tree:
+Reset the complete form tree with [`reset()`](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--reset):
+
+The [imperative methods demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--imperative-methods) and [nested form demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-tree-test) show aggregate dirty state in action.
 
 ```js
 form.reset();
@@ -167,7 +169,7 @@ form.addEventListener('dirty-change', (event) => {
 
 ## Submit
 
-`jb-form` listens for trusted `submit` events from submit-capable child controls, prevents the original event, calls `reportValidity()`, and dispatches its own `submit` event when the form is valid.
+`jb-form` listens for trusted `submit` events from submit-capable child controls, prevents the original event, calls `reportValidity()`, and dispatches its own `submit` event when the form is valid. Try the complete flow in the [form test demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-test).
 
 ```js
 form.addEventListener('submit', (event) => {
@@ -178,7 +180,7 @@ form.addEventListener('submit', (event) => {
 
 ## Virtual elements
 
-Use virtual elements for state that is not represented by a JB/native form control but still needs to participate in form values, dirty checks, or validation.
+Use virtual elements for state that is not represented by a JB/native form control but still needs to participate in form values, dirty checks, or validation. The [value demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-value) includes virtual value participation.
 
 ```ts
 import { ValidationHelper } from 'jb-validation';
@@ -218,7 +220,7 @@ form.virtualElements.remove({ virtualElement: tagList });
 
 ## Same-name values
 
-When two or more named items share the same `name`, the value becomes a `TraverseCollection`, which extends `Map` and is marked with `ValueCollectionSymbol`.
+When two or more named items share the same `name`, the value becomes a `TraverseCollection`, which extends `Map` and is marked with `ValueCollectionSymbol`. See the [same-name demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-with-same-name) and the [value collection documentation](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform-valuecollection--docs).
 
 ```html
 <jb-form>
@@ -237,7 +239,7 @@ If fields have `id`, the collection uses the `id` as the key; otherwise it uses 
 
 ## Sub forms
 
-Nested `jb-form` elements can be managed individually and by a parent form.
+Nested `jb-form` elements can be managed individually and by a parent form, as shown in the [form tree demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--form-tree-test).
 
 ```html
 <jb-form id="parentForm">
@@ -256,7 +258,7 @@ console.log(document.querySelector('#parentForm').getFormValues());
 
 ## Slots and styling
 
-`jb-form` has a default slot for child controls and layout content. It does not currently expose CSS parts or CSS variables.
+`jb-form` has a default slot for child controls and layout content. It does not currently expose CSS parts or CSS variables; the [normal form demo](https://javadbat.github.io/design-system/?path=/story/components-form-elements-jbform--normal) shows the default slot layout.
 
 ## Related Docs
 
