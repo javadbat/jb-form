@@ -1,3 +1,4 @@
+import { defineWebComponent, JBBaseComponent } from "jb-core";
 import type { JBCheckValidityParameter, CheckValidityAsyncResult, ExtractFunction, FormExtractFunction, FormValidationMessages, FormValidationResult, FormValidationSummary, FormValues, JBFormInputStandards, TraverseResult, ValidationValue, VirtualExtractFunction } from './types';
 import { type WithValidation, ValidationHelper, type ValidationItem, type ShowValidationErrorParameters } from 'jb-validation';
 import { VirtualElement } from './virtual-element';
@@ -11,7 +12,7 @@ import { TraverseCollection } from './collections';
 export * from './types.js';
 export * from './utils.js';
 export { VirtualElement, TraverseCollection };
-export class JBFormWebComponent extends HTMLElement {
+export class JBFormWebComponent extends JBBaseComponent {
   static get formAssociated() { return true; }
   //keep original form check validity
   #virtualElements = new VirtualElementList({ handleStateChanges: this.#handleStateChanges.bind(this) });
@@ -482,8 +483,4 @@ export class JBFormWebComponent extends HTMLElement {
     this.dispatchEvent(event);
   }
 }
-const myElementNotExists = !customElements.get('jb-form');
-if (myElementNotExists) {
-  window.customElements.define('jb-form', JBFormWebComponent);
-}
-
+defineWebComponent('jb-form', JBFormWebComponent);
