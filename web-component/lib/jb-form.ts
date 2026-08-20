@@ -484,3 +484,9 @@ export class JBFormWebComponent extends JBBaseComponent {
   }
 }
 defineWebComponent('jb-form', JBFormWebComponent);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "jb-form": JBFormWebComponent;
+  }
+}
