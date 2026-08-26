@@ -24,7 +24,7 @@
   "homepage": "https://github.com/javadbat/jb-form",
   "repository": {
     "type": "git",
-    "url": "https://github.com/javadbat/jb-form"
+    "url": "https://github.com/javadbat/jb-form.git"
   },
   "types": "./dist/JBForm.d.ts",
   "dependencies": {
