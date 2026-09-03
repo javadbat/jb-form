@@ -21,6 +21,7 @@ export interface JBFormInputStandards<TValue = string> extends HTMLElement {
   */
   readonly isDirty: boolean
   initialValue: TValue
+  reset: () => void
   get form(): HTMLFormElement | JBFormWebComponent | null;
   // standard custom reaction base on https://html.spec.whatwg.org/multipage/custom-elements.html#custom-element-reactions
   /**

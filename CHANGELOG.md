@@ -1,5 +1,10 @@
 # changelog
 
+## [1.0.0] - 2026-09-03
+
+### Changed
+
+- Breaking: `JBFormInputStandards` now requires `reset()`, and aggregate form reset invokes that standard method for JB controls.
 
 ## [0.13.0] - 2026-09-02
 

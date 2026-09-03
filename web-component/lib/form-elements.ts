@@ -16,7 +16,11 @@ export class FormElements {
       if (element.localName !== 'jb-form') {
         // Runtime registration can include third-party form-associated custom elements
         // that do not implement the JBFormInputStandards contract.
-        element.formResetCallback?.();
+        if (typeof element.reset === 'function') {
+          element.reset();
+        } else {
+          element.formResetCallback?.();
+        }
       }
     }
     for (const element of this.nativeElements.keys()) {
